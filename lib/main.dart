@@ -1,6 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:get_it/get_it.dart';
+import 'package:http/http.dart';
 
+import 'resources.dart';
+
+void setupDI() {
+  GetIt.I.registerSingleton(Client());
+  GetIt.I.registerSingleton(MovieDbProvider(
+    apiKey: "a7b3c9975791294647265c71224a88ad",
+    baseUrl: "https://api.themoviedb.org/3",
+    language: "en-US",
+    client: GetIt.I.get()
+  ));
+}
 void main() {
+  setupDI();
   runApp(MyApp());
 }
 
