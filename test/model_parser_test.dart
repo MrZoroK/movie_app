@@ -9,15 +9,15 @@ void main() {
   int movieId = 419704;
 
   MovieSection.values.forEach((section) async {
-    test("test MovieBases(${section.toStr()}) parser", (){
-      final file = new File('test_resources/${section.toStr()}.json');
-      Page<MovieBase> popular;
+    test("test MovieBases(${section.toStr}) parser", (){
+      final file = new File('test_resources/${section.toStr}.json');
+      PageOf<MovieBase> popular;
 
-      expect(file.existsSync(), true, reason: "no ${section.toStr()}.json file");
+      expect(file.existsSync(), true, reason: "no ${section.toStr}.json file");
       if (file.existsSync()) {
         var jsonObj = json.decode(file.readAsStringSync());
-        popular = Page<MovieBase>.fromJson(jsonObj);
-        expect(popular != null && popular.items.length >= 2, true, reason: "invalid movies ${section.toStr()}");
+        popular = PageOf<MovieBase>.fromJson(jsonObj);
+        expect(popular != null && popular.items.length >= 2, true, reason: "invalid movies ${section.toStr}");
       }
       
     });
@@ -25,12 +25,12 @@ void main() {
 
   test("test Reviews parser", (){
     final file = new File('test_resources/reviews_$movieId.json');
-    Page<Review> reviews;
+    PageOf<Review> reviews;
 
     expect(file.existsSync(), true, reason: "no reviews_$movieId.json file");
     if (file.existsSync()) {
       var jsonObj = json.decode(file.readAsStringSync());
-      reviews = Page<Review>.fromJson(jsonObj);
+      reviews = PageOf<Review>.fromJson(jsonObj);
     }
     expect(reviews != null && reviews.items.length >= 2, true);
   });

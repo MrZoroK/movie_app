@@ -33,12 +33,12 @@ class MovieDbProvider {
     return url;
   }
 
-  Future<Page<MovieBase>> getMovies(String path, int page) {
+  Future<PageOf<MovieBase>> getMovies(String path, int page) {
     String url = buildRequestUrl(path, params: { "page": page} );
     return client.get(url).then((onValue){
       var jsObj = _responseToJson(onValue);
       if (jsObj != null) {
-        return Page<MovieBase>.fromJson(jsObj);
+        return PageOf<MovieBase>.fromJson(jsObj);
       }
       return null;
     });
@@ -78,7 +78,7 @@ class MovieDbProvider {
     });
   }
 
-  Future<Page<Review>> getReviews(int movieId, int page) {
+  Future<PageOf<Review>> getReviews(int movieId, int page) {
     String url = buildRequestUrl("/movie/$movieId/reviews",
                                   params: {
                                     "page": page
@@ -86,7 +86,7 @@ class MovieDbProvider {
     return client.get(url).then((onValue){
       var jsObj = _responseToJson(onValue);
       if (jsObj != null) {
-        return Page<Review>.fromJson(jsObj);
+        return PageOf<Review>.fromJson(jsObj);
       }
       return null;
     });

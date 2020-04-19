@@ -3,7 +3,7 @@ import '../models.dart';
 part 'page.g.dart';
 
 @JsonSerializable(explicitToJson: true)
-class Page<T> {
+class PageOf<T> {
   @_Converter()
   @JsonKey(name: "results")
   List<T> items;
@@ -20,14 +20,30 @@ class Page<T> {
     return false;
   }
 
-  factory Page.fromJson(Map<String, dynamic> json) => _$PageFromJson(json);
+  factory PageOf.fromJson(Map<String, dynamic> json) => _$PageFromJson(json);
+  factory PageOf.fromList(List<T> list) {
+     return PageOf<T>(
+      page: 1,
+      totalPages: 1,
+      totalResults: list.length,
+      items: list,
+    );
+  }
   Map<String, dynamic> toJson() => _$PageToJson(this);  
-  Page(
+  PageOf(
     {
     this.page,
     this.totalPages,
     this.totalResults,
     this.items});
+
+  void append(PageOf<T> nextPage) {
+    //TODO: should merge instead of append
+    if (this.page < nextPage.page) {
+      this.items.addAll(nextPage.items);
+      this.page = nextPage.page;
+    }
+  }
 }
 
 class _Converter<T> implements JsonConverter<T, Object> {

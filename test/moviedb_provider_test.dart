@@ -28,10 +28,10 @@ void main() {
     MovieSection.values.forEach((section) async {
       String sectionUrl = section.url(movieId: movieId);
       String getVideosUrl = movieDbProvider.buildRequestUrl(sectionUrl, params: pageParam);
-      test('getMovies(${section.toStr()}) - HttpCode(200)', () async {
+      test('getMovies(${section.toStr}) - HttpCode(200)', () async {
         when(client.get(getVideosUrl))
         .thenAnswer((_) async {
-          final file = new File('test_resources/${section.toStr()}.json');
+          final file = new File('test_resources/${section.toStr}.json');
           String response = "";
           if (file.existsSync()) {
             response = file.readAsStringSync();
@@ -39,11 +39,11 @@ void main() {
           return Response(response, 200, headers: headers);
         });
 
-        Page<MovieBase> movies = await movieDbProvider.getMovies(sectionUrl, 1);
-        expect(movies, const TypeMatcher<Page<MovieBase>>());
+        PageOf<MovieBase> movies = await movieDbProvider.getMovies(sectionUrl, 1);
+        expect(movies, const TypeMatcher<PageOf<MovieBase>>());
         expect(movies.items.length >= 2, true);//check if results parsed correctly
       });
-      test('getMovies(${section.toStr()}) - HttpCode(404)', () async {
+      test('getMovies(${section.toStr}) - HttpCode(404)', () async {
         when(client.get(getVideosUrl))
         .thenAnswer((_) async {
           return Response('', 404);
@@ -146,7 +146,7 @@ void main() {
       });
 
       var reviews = await movieDbProvider.getReviews(movieId, 1);
-      expect(reviews, const TypeMatcher<Page<Review>>());
+      expect(reviews, const TypeMatcher<PageOf<Review>>());
     });
     test('getReviews($movieId) - HttpCode(404)', () async {
       when(client.get(getReviewUrl))
