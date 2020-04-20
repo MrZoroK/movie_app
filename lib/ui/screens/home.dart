@@ -26,9 +26,9 @@ class _HomeScreenState extends State<HomeScreen> {
       MaterialPageRoute(
         builder: (context) => BlocProvider<MovieDetailBloc>(
           builder: (_, bloc) {
-            return bloc ?? MovieDetailBloc();
+            return bloc ?? MovieDetailBloc(moviebase);
           },
-          child: MovieDetailScreen(movieBase: moviebase),
+          child: MovieDetailScreen(),
         )
       )
     );
@@ -50,7 +50,7 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       appBar: _topbar(context),
       body: _buildSections(),
-      backgroundColor: Color(0xFFF2F2F2),
+      backgroundColor: Color(0xFFF8F8F8),
     );
   }
 
@@ -87,10 +87,6 @@ class _HomeScreenState extends State<HomeScreen> {
         child: ExpandableListView(
           stream: _bloc.movies(section),
           itemBuilder: (context, item){
-            if (section == MovieSection.UPCOMING && item == null) {
-              int x = 0;
-              x++;
-            }
             return _buildMovieCard(item);
           },
           onLoadMore: (nextPage){

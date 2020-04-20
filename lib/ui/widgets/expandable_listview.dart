@@ -107,6 +107,7 @@ class _ExpandableListViewState<T> extends State<ExpandableListView> with Automat
     }
     if (canLoadMore) {
       _expandableList.items.add(null);//dummy at last
+      //TODO: remove this when appending
     }
     int itemCount = _expandableList.items.length;
     
@@ -122,7 +123,7 @@ class _ExpandableListViewState<T> extends State<ExpandableListView> with Automat
         scrollDirection: Axis.horizontal,
         controller: _scrollCtrler,
         itemBuilder: (context, index){
-          if (index == itemCount - 1) {
+          if (index == itemCount - 1 && _expandableList.items[index] == null) {
             return FlatButton(
               child: Text("Load more"),
               onPressed: _loadMore,

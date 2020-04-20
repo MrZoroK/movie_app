@@ -20,7 +20,7 @@ class PageOf<T> {
     return false;
   }
 
-  factory PageOf.fromJson(Map<String, dynamic> json) => _$PageFromJson(json);
+  factory PageOf.fromJson(Map<String, dynamic> json) => _$PageOfFromJson(json);
   factory PageOf.fromList(List<T> list) {
      return PageOf<T>(
       page: 1,
@@ -29,7 +29,7 @@ class PageOf<T> {
       items: list,
     );
   }
-  Map<String, dynamic> toJson() => _$PageToJson(this);  
+  Map<String, dynamic> toJson() => _$PageOfToJson(this);  
   PageOf(
     {
     this.page,

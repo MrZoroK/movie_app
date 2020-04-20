@@ -2,7 +2,6 @@ import 'dart:io';
 
 import 'package:mockito/mockito.dart';
 import 'package:movie_app/models.dart';
-import 'package:movie_app/models/movie_detail.dart';
 import 'package:test/test.dart';
 import 'package:http/http.dart';
 
@@ -51,33 +50,6 @@ void main() {
 
         expect(await movieDbProvider.getMovies(sectionUrl, 1), null);
       });
-    });
-
-    //==========================TEST getMovie(Detail)==========================//
-    String getMovieUrl = movieDbProvider.buildRequestUrl("/movie/$movieId");
-    test('getMovie($movieId) - HttpCode(200)', () async {
-
-      when(client.get(getMovieUrl))
-      .thenAnswer((_) async {
-        final file = new File('test_resources/movie_detail_$movieId.json');
-        String response = "";
-        if (file.existsSync()) {
-          response = file.readAsStringSync();
-        }
-        return Response(response, 200, headers: headers);
-      });
-
-      var movieDetail = await movieDbProvider.getMovie(movieId);
-      expect(movieDetail, const TypeMatcher<MovieDetail>());
-    });
-    test('getMovie($movieId) - HttpCode(404)', () async {
-      when(client.get(getMovieUrl))
-      .thenAnswer((_) async {
-        return Response('', 404);
-      });
-
-      var movieDetail = await movieDbProvider.getMovie(movieId);
-      expect(movieDetail, null);
     });
 
     //==========================TEST getVideos==========================//

@@ -8,7 +8,7 @@ enum SectionStyle {
 }
 extension SectionStyleExt on SectionStyle {
   Color get titleBgColor {
-    return this == SectionStyle.DETAIL ? const Color(0xFFF8F8F8) : Colors.transparent;
+    return this == SectionStyle.DETAIL ? const Color(0xFFF2F2F2) : Colors.transparent;
   }
   Color get textColor {
     return this == SectionStyle.DETAIL ? const Color(0xFF4A4A4A) : const Color(0xFF3E4A59);

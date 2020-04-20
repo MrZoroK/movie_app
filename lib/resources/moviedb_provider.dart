@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'package:http/http.dart';
-import 'package:movie_app/models/movie_detail.dart';
 import 'dart:developer' as developer;
 
 import '../models.dart';
@@ -39,18 +38,6 @@ class MovieDbProvider {
       var jsObj = _responseToJson(onValue);
       if (jsObj != null) {
         return PageOf<MovieBase>.fromJson(jsObj);
-      }
-      return null;
-    });
-  }
-
-  Future<MovieDetail> getMovie(int id) {
-    String url = buildRequestUrl("/movie/$id");
-    var request = client.get(url);
-    return request.then((onValue){
-      var jsObj = _responseToJson(onValue);
-      if (jsObj != null) {
-        return MovieDetail.fromJson(jsObj);
       }
       return null;
     });

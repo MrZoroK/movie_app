@@ -1,5 +1,4 @@
 export 'models/movie_base.dart';
-export 'models/movie_detail.dart';
 export 'models/video.dart';
 export 'models/review.dart';
 export 'models/page.dart';

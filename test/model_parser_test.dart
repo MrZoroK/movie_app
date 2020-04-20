@@ -58,16 +58,4 @@ void main() {
     }
     expect(casts != null && casts.length >= 2, true);
   });
-
-  test("test MovieDetail parser", (){
-    final file = new File('test_resources/movie_detail_$movieId.json');
-    MovieDetail movieDetail;
-
-    expect(file.existsSync(), true, reason: "no movie_detail_$movieId.json file");
-    if (file.existsSync()) {
-      var jsonObj = json.decode(file.readAsStringSync());
-      movieDetail = MovieDetail.fromJson(jsonObj);
-    }
-    expect(movieDetail != null, true);
-  });
 }

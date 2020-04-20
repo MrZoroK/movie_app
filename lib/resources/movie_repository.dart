@@ -1,5 +1,3 @@
-import 'package:movie_app/models/movie_detail.dart';
-
 import '../config/movie_section.dart';
 import '../models.dart';
 import '../resources.dart';
@@ -13,7 +11,11 @@ class MovieRepository {
     return movieDbProvider.getMovies(movieSection.url(), page);
   }
 
-  Future<MovieDetail> getMovie(int id) {
-    return null;
+  Future<PageOf<MovieBase>> getRecommendedMovies(int movieId, int page) {
+    return movieDbProvider.getMovies(MovieSection.RECOMMENDATIONS.url(movieId: movieId), page);
+  }
+
+  Future<List<Cast>> getCasts(int movieId) {
+    return movieDbProvider.getCasts(movieId);
   }
 }
