@@ -15,4 +15,11 @@ class Video {
     this.key,
     this.site,
     this.name});
+
+  @override
+  bool operator ==(dynamic other) {
+    return other is Video && id == other.id;
+  }
+  @override
+  int get hashCode => super.hashCode;
 }

@@ -42,12 +42,12 @@ class _ExpandableListViewState<T> extends State<ExpandableListView> with Automat
 
 
 
-  _scrollListener() {
-    if (_scrollCtrler.offset >= _scrollCtrler.position.maxScrollExtent &&
-        !_scrollCtrler.position.outOfRange) {
-      _loadMore();
-    }
-  }
+  // _scrollListener() {
+  //   if (_scrollCtrler.offset >= _scrollCtrler.position.maxScrollExtent &&
+  //       !_scrollCtrler.position.outOfRange) {
+  //     _loadMore();
+  //   }
+  // }
 
   bool get canLoadMore => _expandableList != null && _expandableList.page < _expandableList.totalPages;
 
@@ -65,7 +65,7 @@ class _ExpandableListViewState<T> extends State<ExpandableListView> with Automat
   @override void initState() {
     super.initState();
     _scrollCtrler = ScrollController();
-    _scrollCtrler.addListener(_scrollListener);
+    //_scrollCtrler.addListener(_scrollListener);
     if (widget.onLoadMore != null) {
       //the first time of load
       widget.onLoadMore(1);
@@ -129,7 +129,6 @@ class _ExpandableListViewState<T> extends State<ExpandableListView> with Automat
     }
     if (canLoadMore) {
       _expandableList.items.add(null);//dummy at last
-      //TODO: remove this when appending
     }
     int itemCount = _expandableList.items.length;
 
@@ -142,11 +141,11 @@ class _ExpandableListViewState<T> extends State<ExpandableListView> with Automat
             return;
           }
           if (widget.scrollDirection == Axis.horizontal) {
-            if (event.delta.dx > 5.0 && _scrollCtrler.position.pixels == _scrollCtrler.position.minScrollExtent) {
+            if (event.delta.dx > 10.0 && _scrollCtrler.position.pixels == _scrollCtrler.position.minScrollExtent) {
               _streamCtrler.add(true);
             }
           } else {
-            if (event.delta.dy > 5.0 && _scrollCtrler.position.pixels == _scrollCtrler.position.minScrollExtent) {
+            if (event.delta.dy > 10.0 && _scrollCtrler.position.pixels == _scrollCtrler.position.minScrollExtent) {
               _streamCtrler.add(true);
             }
           }
@@ -157,9 +156,22 @@ class _ExpandableListViewState<T> extends State<ExpandableListView> with Automat
           controller: _scrollCtrler,
           itemBuilder: (context, index){
             if (index == itemCount - 1 && _expandableList.items[index] == null) {
-              return FlatButton(
-                child: Text("Load more"),
-                onPressed: _loadMore,
+              return Center(
+                child: FlatButton(
+                  child: Container(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      mainAxisSize: MainAxisSize.min,
+                      children: <Widget>[
+                        Icon(
+                          Icons.play_arrow, color: Color(0xFF00CBCF), size: 50
+                        ),
+                        Text("Load more"),
+                      ],
+                    ),
+                  ),
+                  onPressed: _loadMore,
+                ),
               );
             } else {
               return widget.itemBuilder(context, _expandableList.items[index]);

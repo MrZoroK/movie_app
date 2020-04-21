@@ -13,4 +13,11 @@ class Genre {
   Genre(
     {this.id,
     this.name});
+
+  @override
+  bool operator ==(covariant Genre other) {
+    return other is Genre && id == other.id;
+  }
+  @override
+  int get hashCode => super.hashCode;
 }

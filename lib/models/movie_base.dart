@@ -62,4 +62,11 @@ class MovieBase {
     });
     return strMonth + " $year";
   }
+
+  @override
+  bool operator ==(dynamic other) {
+    return other is MovieBase && id == other.id;
+  }
+  @override
+  int get hashCode => super.hashCode;
 }

@@ -1,3 +1,6 @@
+import 'dart:math';
+import 'dart:ui';
+
 import 'package:json_annotation/json_annotation.dart';
 part 'cast.g.dart';
 
@@ -19,4 +22,12 @@ class Cast {
     this.name,
     this.order,
     this.profilePath});
+
+  @override
+  bool operator ==(dynamic other) {
+    return other is Cast && id == other.id;
+  }
+
+  @override
+  int get hashCode => super.hashCode;
 }

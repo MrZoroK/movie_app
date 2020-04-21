@@ -18,4 +18,11 @@ class Review {
     {this.id,
     this.author,
     this.content});
+
+  @override
+  bool operator ==(dynamic other) {
+    return other is Review && id == other.id;
+  }
+  @override
+  int get hashCode => super.hashCode;
 }

@@ -38,10 +38,28 @@ class PageOf<T> {
     this.items});
 
   void append(PageOf<T> nextPage) {
-    //TODO: should merge instead of append
     if (this.page < nextPage.page) {
+      //remove duplicate or null item
+      this.items.removeWhere((toRemove){
+        if (toRemove == null) {
+          return true;
+        }
+        for (int i = 0; i < nextPage.items.length; i++) {
+          if (toRemove == nextPage.items[i]) {
+            return true;
+          }
+        }
+        return false;
+      });
+      
       this.items.addAll(nextPage.items);
       this.page = nextPage.page;
+    } else if (nextPage.page == 1) {
+      //refresh case => reset instead of appending
+      this.items = nextPage.items;
+      this.page = nextPage.page;
+      this.totalPages = nextPage.totalPages;
+      this.totalResults = nextPage.totalResults;
     }
   }
 }
