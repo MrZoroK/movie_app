@@ -1,16 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:movie_app/blocs/home_bloc.dart';
-import 'package:movie_app/config/movie_section.dart';
-import 'package:movie_app/models.dart';
-import 'package:movie_app/models/movie_base.dart';
-import 'package:movie_app/ui/screens/movie_detail.dart';
-import 'package:movie_app/ui/widgets/box_shadow_image.dart';
-import 'package:movie_app/ui/widgets/common_widget_builder.dart';
-import 'package:movie_app/ui/widgets/expandable_listview.dart';
-import 'package:movie_app/ui/widgets/section_widget.dart';
 
-import '../../blocs.dart';
+import 'package:movie_app/config/movie_section.dart';
+import 'package:movie_app/blocs.dart';
+import 'package:movie_app/models.dart';
+import 'package:movie_app/uis.dart';
+import 'package:movie_app/utils.dart';
+
+class MovieCardConfig {
+  static const SIZE = const Size(140, 210);
+  static const PADDING = const EdgeInsets.only(right: 20);
+  static const SHADOW_RECT = const Rect.fromLTWH(8, 35, 123, 185);
+  static const TITLE_HEIGHT = 60;
+}
+class TrendingCardConfig {
+  static const SIZE = const Size(300, 160);
+  static const PADDING = const EdgeInsets.only(right: 20);
+  static const SHADOW_RECT = const Rect.fromLTWH(15, 26, 275, 144);
+  static const TITLE_HEIGHT = 50;
+}
 
 class HomeScreen extends StatefulWidget {
   @override
@@ -19,6 +27,15 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   HomeBloc _bloc;
+  static const SECTION_PADDING = 20.0;
+
+  double _widthRatio;
+  double get widthRatio{
+    if (_widthRatio == null) {
+      _widthRatio = MediaQuery.of(context).size.width / DESIGNED_WIDTH;
+    }
+    return _widthRatio;
+  } 
 
   _gotoMovieDetailScreen(MovieBase moviebase) {
     Navigator.push(
@@ -37,40 +54,29 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     if (_bloc == null) {
       _bloc = BlocProvider.of(context);
-      //_bloc.loadTrendingMovies(1);
     }
-
-    //TODO: remove this
-    MovieSection.values.forEach((e) {
-      if (e != MovieSection.RECOMMENDATIONS) {
-        _bloc.loadMovies(e, 1);
-      }
-    });
     
     return Scaffold(
       appBar: _topbar(context),
       body: _buildSections(),
-      backgroundColor: Color(0xFFF8F8F8),
     );
   }
 
   Widget _buildSections() {
     List<Widget> children = List();
-    children.add(Container());
     children.add(Padding(
-      padding: const EdgeInsets.only(top: 20.0),
+      padding: const EdgeInsets.only(top: SECTION_PADDING),
       child: _buildTrending(),
     ));
 
     MovieSection.values.forEach((section) {
       if (section != MovieSection.RECOMMENDATIONS && section != MovieSection.TRENDING) {
         children.add(Padding(
-          padding: const EdgeInsets.only(bottom: 20.0),
+          padding: const EdgeInsets.only(bottom: SECTION_PADDING),
           child: _buildSection(section),
         ));
       }
     });
-    children.add(Container());
     
     return Center(
       child: ListView(
@@ -79,21 +85,23 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
+  double get _movieSecionHeight {
+    Size cardSize = MovieCardConfig.SIZE * widthRatio;
+    return cardSize.height + MovieCardConfig.TITLE_HEIGHT;
+  }
+
   Widget _buildSection(MovieSection section) {
     return SectionWidget(
       text: section.toText.toUpperCase(), sectionStyle: SectionStyle.HOME,
-      list: Padding(
-        padding: const EdgeInsets.only(left: 16.0),
-        child: ExpandableListView(
-          stream: _bloc.movies(section),
-          itemBuilder: (context, item){
-            return _buildMovieCard(item);
-          },
-          onLoadMore: (nextPage){
-            _bloc.loadMovies(section, nextPage);
-          },
-          height: 260,
-        ),
+      list: ExpandableListView(
+        stream: _bloc.movies(section),
+        itemBuilder: (context, item){
+          return _buildMovieCard(item);
+        },
+        onLoadMore: (nextPage){
+          _bloc.loadMovies(section, nextPage);
+        },
+        height: _movieSecionHeight,
       ),
       onPressed: () {
 
@@ -102,56 +110,60 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildMovieCard(MovieBase movie) {
-    Widget img = Container();
+    String imgUrl;
     Widget title = Container();
-    Size size = Size(140, 210);
+
+    Size cardSize = MovieCardConfig.SIZE * widthRatio;
+    Rect cardShadowRect = MovieCardConfig.SHADOW_RECT * widthRatio;
+
     if (movie != null) {
-      img = CommonWidgetBuilder.loadNetworkImage(        
-        "https://image.tmdb.org/t/p/original${movie.posterPath}", roundRadius: 6.0, linearProcess: false,
-        width: size.width, height: size.height,
-      );
+      imgUrl = "https://image.tmdb.org/t/p/original${movie.posterPath}";
       
-      title = Container(
-        alignment: Alignment.bottomCenter,
-        width: size.width,
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: <Widget>[
-            Container(
-              width: size.width - 5, height: 40,
-              child: Text(
-                movie.title, 
-                style: TextStyle(
-                  fontFamily: 'Open Sans', fontWeight: FontWeight.bold,
-                  fontSize: 13,
+      title = Column(
+        children: <Widget>[
+          Container(height: cardSize.height, margin: EdgeInsets.only(bottom: 10)),
+          Container(
+            width: cardSize.width,
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: <Widget>[
+                Container(
+                  width: cardSize.width - 7,
+                  child: Text(
+                    movie.title, 
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold, fontSize: 15, color: TITLE_COLOR,
+                    ),
+                    textAlign: TextAlign.center,
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 2,
+                  ),
                 ),
-                textAlign: TextAlign.center,
-                overflow: TextOverflow.clip,
-              ),
+                InkWell(
+                  child: SvgPicture.asset("assets/ic-moredetails.svg"),
+                  onTap: () => _gotoMovieDetailScreen(movie),
+                )
+              ],
             ),
-            InkWell(
-              child: SvgPicture.asset("assets/ic-moredetails.svg"),
-              onTap: () => _gotoMovieDetailScreen(movie),
-            )
-          ],
-        ),
+          )
+        ],
       );
     }
     
 
     return Padding(
-      padding: const EdgeInsets.only(right: 20),
+      padding: MovieCardConfig.PADDING,
       child: Stack(
         children: <Widget>[
           Container(
-            height: 260,
+            height: _movieSecionHeight,
             child: InkWell(
               child: BoxShadowImage(
-                child: img, size: size, bgColor: Colors.grey[300], borderRadius: 6,
-                shadowBox: Rect.fromLTWH(8, 35, 123, 185),
-                shadowColor: Color(0xFF4A4A4A).withOpacity(0.7),
-                shadowRadius: 5.3, shadowBlurRadius: 24,
+                imgUrl: imgUrl,
+                size: cardSize, borderRadius: 6,
+                shadowRect: cardShadowRect,
+                shadowBorderRadius: 5.3, shadowBlurRadius: 24,
               ),
               onTap: () => _gotoMovieDetailScreen(movie),
             ),
@@ -162,24 +174,25 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
+  double get _trendingSecionHeight {
+    Size cardSize = TrendingCardConfig.SIZE * widthRatio;
+    return cardSize.height + TrendingCardConfig.TITLE_HEIGHT;
+  }
   Widget _buildTrending() {
     var section = MovieSection.TRENDING;
     return SectionWidget(
       text: section.toText.toUpperCase(),
       sectionStyle: SectionStyle.TRENDING,
-      list: Padding(
-        padding: const EdgeInsets.only(left: 16.0),
-        child: ExpandableListView(
-          stream: _bloc.movies(section),
-          itemBuilder: (context, item){
-            return _buildTrendingMovieCard(item);
-          },
-          onLoadMore: (nextPage){
-            _bloc.loadMovies(section, nextPage);
-          },
-          height: 210,
-          dummySize: 2,
-        ),
+      list: ExpandableListView(
+        stream: _bloc.movies(section),
+        itemBuilder: (context, item){
+          return _buildTrendingMovieCard(item);
+        },
+        onLoadMore: (nextPage){
+          _bloc.loadMovies(section, nextPage);
+        },
+        height: _trendingSecionHeight,
+        dummySize: 2,
       ),
       onPressed: () {
 
@@ -188,23 +201,20 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildTrendingMovieCard(MovieBase movie) {
-    Widget img;
-    Size size = Size(300, 160);
+    String imgUrl;
+    Size cardSize = TrendingCardConfig.SIZE * widthRatio;
     if (movie != null) {
-      img = CommonWidgetBuilder.loadNetworkImage(        
-        "https://image.tmdb.org/t/p/original${movie.backdropPath}", roundRadius: 6.0, linearProcess: false,
-        width: size.width, height: size.height,
-      );
+      imgUrl = "https://image.tmdb.org/t/p/original${movie.backdropPath}";
     }
 
     return Padding(
-      padding: const EdgeInsets.only(right: 20),
+      padding: TrendingCardConfig.PADDING,
       child: InkWell(
         child: BoxShadowImage(
-          child: img, size: size, bgColor: Colors.grey[300], borderRadius: 6,
-          shadowBox: Rect.fromLTWH(15, 26, 275, 144),
-          shadowColor: Color(0xFF4A4A4A).withOpacity(0.7),
-          shadowRadius: 5.4, shadowBlurRadius: 24.5,
+          imgUrl: imgUrl,
+          size: cardSize, borderRadius: 6,
+          shadowRect: TrendingCardConfig.SHADOW_RECT * widthRatio,
+          shadowBorderRadius: 5.4, shadowBlurRadius: 24.5,
         ),
         onTap: () => _gotoMovieDetailScreen(movie),
       ),

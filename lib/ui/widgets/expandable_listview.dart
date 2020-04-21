@@ -1,10 +1,11 @@
 import 'dart:async';
+import 'dart:math';
 import 'dart:ui';
-
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:shimmer/shimmer.dart';
 
-import '../../models.dart';
+import 'package:movie_app/models.dart';
 
 typedef LoadMoreCallback = void Function(int nextPage);
 typedef ItemBuilder<T> = Widget Function(BuildContext context, T item);
@@ -15,13 +16,17 @@ class ExpandableListView<T> extends StatefulWidget {
   final ItemBuilder itemBuilder;
   final double height;
   final int dummySize;
+  final Axis scrollDirection;
+  final double verticalItemHeight;
 
   ExpandableListView({
     @required this.stream,
     @required this.itemBuilder,
     @required this.onLoadMore,
     @required this.height,
-    this.dummySize = 3
+    this.dummySize = 3,
+    this.scrollDirection = Axis.horizontal,
+    this.verticalItemHeight = 0
   });
 
   @override
@@ -56,9 +61,13 @@ class _ExpandableListViewState<T> extends State<ExpandableListView> with Automat
   }
 
   @override void initState() {
+    super.initState();
     _scrollCtrler = ScrollController();
     _scrollCtrler.addListener(_scrollListener);
-    super.initState();
+    if (widget.onLoadMore != null) {
+      //the first time of load
+      widget.onLoadMore(1);
+    }
   }
 
   @override
@@ -66,7 +75,6 @@ class _ExpandableListViewState<T> extends State<ExpandableListView> with Automat
     super.build(context);//this needed for wantKeepAlive
 
     return Container(
-      height: widget.height,
       child: Stack(
         children: [
           StreamBuilder(
@@ -87,18 +95,30 @@ class _ExpandableListViewState<T> extends State<ExpandableListView> with Automat
 
   Widget _dummyList() {
     List<T> dummy = List.generate(widget.dummySize, (index) => null);
+    double veticalHeight = min(widget.height, widget.dummySize * widget.verticalItemHeight);
+
     return Shimmer.fromColors(
       baseColor: Colors.grey[300],
       highlightColor: Colors.grey[50],
-      child: ListView(
-        scrollDirection: Axis.horizontal,
-        children: dummy.map((e){
-          return widget.itemBuilder(context, e);
-        }).toList(),
+      child: Container(
+        height: widget.scrollDirection == Axis.horizontal ? widget.height : veticalHeight,
+        child: ListView(
+          scrollDirection: widget.scrollDirection,
+          children: dummy.map((e){
+            return widget.itemBuilder(context, e);
+          }).toList(),
+        ),
       )
     );
   }
 
+  double calcHeight (int itemCount) {
+    if (itemCount == 0) {
+      return 0;
+    }
+    double veticalHeight = min(widget.height, itemCount * widget.verticalItemHeight);
+    return widget.scrollDirection == Axis.horizontal ? widget.height : veticalHeight;
+  }
   Widget _updateList(PageOf<T> newData) {
     if (_expandableList == null) {
       _expandableList = newData;
@@ -110,28 +130,38 @@ class _ExpandableListViewState<T> extends State<ExpandableListView> with Automat
       //TODO: remove this when appending
     }
     int itemCount = _expandableList.items.length;
-    
+
     _streamCtrler.add(false);
-    return Listener(
-      onPointerMove: (event) async {
-        if (event.delta.dx > 5.0 && _scrollCtrler.position.pixels == _scrollCtrler.position.minScrollExtent) {
-          _streamCtrler.add(true);
-        }
-      },
-      child: ListView.builder(
-        itemCount: itemCount,
-        scrollDirection: Axis.horizontal,
-        controller: _scrollCtrler,
-        itemBuilder: (context, index){
-          if (index == itemCount - 1 && _expandableList.items[index] == null) {
-            return FlatButton(
-              child: Text("Load more"),
-              onPressed: _loadMore,
-            );
+    return Container(
+      height: calcHeight(itemCount),
+      child: Listener(
+        onPointerMove: (event) async {
+          if (widget.scrollDirection == Axis.horizontal) {
+            if (event.delta.dx > 5.0 && _scrollCtrler.position.pixels == _scrollCtrler.position.minScrollExtent) {
+              _streamCtrler.add(true);
+            }
           } else {
-            return widget.itemBuilder(context, _expandableList.items[index]);
+            if (event.delta.dy > 5.0 && _scrollCtrler.position.pixels == _scrollCtrler.position.minScrollExtent) {
+              _streamCtrler.add(true);
+            }
           }
+          
         },
+        child: ListView.builder(
+          itemCount: itemCount,
+          scrollDirection: widget.scrollDirection,
+          controller: _scrollCtrler,
+          itemBuilder: (context, index){
+            if (index == itemCount - 1 && _expandableList.items[index] == null) {
+              return FlatButton(
+                child: Text("Load more"),
+                onPressed: _loadMore,
+              );
+            } else {
+              return widget.itemBuilder(context, _expandableList.items[index]);
+            }
+          },
+        ),
       ),
     );
   }

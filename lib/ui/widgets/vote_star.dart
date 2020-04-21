@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:movie_app/ui/widgets/progressive_widget.dart';
+import 'package:movie_app/uis.dart';
 
 class VoteStar extends StatelessWidget {
   final double rating;
@@ -19,29 +19,25 @@ class VoteStar extends StatelessWidget {
     double decimal = rating - rating.floor();
     if (decimal != 0)
       length++;
-    var inactiveStar = SvgPicture.asset(
-      "assets/ic-star-inactive.svg",
-      width: size, height: size,
-    );
-    var activeStar =  SvgPicture.asset(
-      "assets/ic-star.svg",
-      width: size, height: size
-    );
+
+    String starPath = "assets/ic-star.svg";
     return Row(
       children: List.generate(5, (idx){
         Widget star;
         if (idx == length - 1 && decimal != 0)
         {
           star = ProgressiveWidget(
-            mask: "assets/ic-star-inactive.svg",
+            mask: starPath,
             color: Color(0xFFF1CA23),
             size: Size(size, size),
             percent: decimal,
           );
-        } else if (idx >= length) {
-          star = inactiveStar;
         } else {
-          star = activeStar;
+          star = SvgPicture.asset(
+            starPath,
+            width: size, height: size,
+            color: idx >= length ? Color(0xFFD2D2D2) : Color(0xFFF1CA23),
+          );
         }
         return Padding(
           padding: EdgeInsets.only(right: starAlign),

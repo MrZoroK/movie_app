@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:get_it/get_it.dart';
 import 'package:movie_app/models.dart';
 import 'package:movie_app/resources/movie_repository.dart';
@@ -18,9 +20,21 @@ class MovieDetailBloc extends BlocBase {
   var _recommendationPublishers = PublishSubject<PageOf<MovieBase>>();
   Stream<PageOf<MovieBase>> get recommendation => _recommendationPublishers.stream;
 
+  var _videosPublishers = PublishSubject<PageOf<Video>>();
+  Stream<PageOf<Video>> get videos => _videosPublishers.stream;
+
+  var _reviewsPublishers = PublishSubject<PageOf<Review>>();
+  Stream<PageOf<Review>> get reviews => _reviewsPublishers.stream;
+
   void loadCasts() {
     repository.getCasts(movie.id).then((value){
       _castsPublishers.sink.add(PageOf.fromList(value));
+    });
+  }
+
+  void loadVideos() {
+    repository.getVideos(movie.id).then((value){
+      _videosPublishers.sink.add(PageOf.fromList(value));
     });
   }
 
@@ -29,9 +43,18 @@ class MovieDetailBloc extends BlocBase {
       _recommendationPublishers.sink.add(value);
     });
   }
+
+  void loadReviews(int page) {
+    repository.getReviews(movie.id, page).then((value){
+      _reviewsPublishers.sink.add(value);
+    });
+  }
+  
   @override
   void dispose() {
     _castsPublishers.close();
     _recommendationPublishers.close();
+    _videosPublishers.close();
+    _reviewsPublishers.close();
   }
 }

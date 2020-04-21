@@ -15,7 +15,15 @@ class MovieRepository {
     return movieDbProvider.getMovies(MovieSection.RECOMMENDATIONS.url(movieId: movieId), page);
   }
 
+  Future<List<Video>> getVideos(int movieId) {
+    return movieDbProvider.getVideos(movieId);
+  }
+
   Future<List<Cast>> getCasts(int movieId) {
     return movieDbProvider.getCasts(movieId);
+  }
+
+  Future<PageOf<Review>> getReviews(int movieId, int page) {
+    return movieDbProvider.getReviews(movieId, page);
   }
 }

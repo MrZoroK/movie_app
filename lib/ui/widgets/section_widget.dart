@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
+import '../constants.dart';
+
 enum SectionStyle {
   TRENDING,
   HOME,
@@ -11,7 +13,7 @@ extension SectionStyleExt on SectionStyle {
     return this == SectionStyle.DETAIL ? const Color(0xFFF2F2F2) : Colors.transparent;
   }
   Color get textColor {
-    return this == SectionStyle.DETAIL ? const Color(0xFF4A4A4A) : const Color(0xFF3E4A59);
+    return this == SectionStyle.DETAIL ? const Color(0xFF4A4A4A) : TITLE_COLOR;
   }
   double get textSize {
     return this == SectionStyle.TRENDING ? 20 : 18;
@@ -27,13 +29,12 @@ extension SectionStyleExt on SectionStyle {
   }
 
   EdgeInsetsGeometry get tilePadding {
+    var padding = EdgeInsets.only(left: ALL_LEFT_PADDING.left, right: 16);
     if (this == SectionStyle.DETAIL) {
-      return EdgeInsets.only(left: 16, top: 11, right: 16, bottom: 11);
-    } else {
-      return EdgeInsets.only(left: 16, right: 16);
+      padding = padding.add(EdgeInsets.only(top: 11, bottom: 11));
     }
+    return padding;
   }
-
 }
 
 class SectionWidget extends StatelessWidget {
@@ -62,27 +63,32 @@ class SectionWidget extends StatelessWidget {
       );
     }
 
-    return Column(
-      children: <Widget>[
-        Container(
-          padding: sectionStyle.tilePadding,
-          margin: EdgeInsets.only(bottom: sectionStyle.titleMargin),
-          color: sectionStyle.titleBgColor,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: <Widget>[
-              Text(
-                text,
-                style: TextStyle(
-                  fontFamily: "Open Sans", fontWeight: FontWeight.bold,
-                  fontSize: sectionStyle.textSize, color: sectionStyle.textColor
-                ),
-              ),
-              arrow
-            ],
+    Widget title = Container(
+      padding: sectionStyle.tilePadding,
+      margin: EdgeInsets.only(bottom: sectionStyle.titleMargin),
+      color: sectionStyle.titleBgColor,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: <Widget>[
+          Text(
+            text,
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: sectionStyle.textSize, color: sectionStyle.textColor
+            ),
           ),
-        ),
-        list
+          arrow
+        ],
+      ),
+    );
+
+    return Column(
+      children: [
+        title,
+        Padding(
+          padding: ALL_LEFT_PADDING,
+          child: list,
+        )
       ],
     );
   }

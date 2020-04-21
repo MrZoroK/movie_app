@@ -54,6 +54,8 @@ class MyApp extends StatelessWidget {
         // the app on. For desktop platforms, the controls will be smaller and
         // closer together (more dense) than on mobile platforms.
         visualDensity: VisualDensity.adaptivePlatformDensity,
+        fontFamily: 'Helvetica',
+        backgroundColor: const Color(0xFFF8F8F8)
       ),
       home: BlocProvider<HomeBloc>(builder: (_, bloc){
         return bloc ?? HomeBloc();

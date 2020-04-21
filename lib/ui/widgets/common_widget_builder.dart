@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:shimmer/shimmer.dart';
 
 class CommonWidgetBuilder {
-  static Widget loadNetworkImage(url, {width: 100.0, height: 100.0, EdgeInsets padding: const EdgeInsets.all(0), linearProcess: true, roundRadius = 0.0 }) {
+  static Widget loadNetworkImage(url, {double width: 100.0, double height: 100.0, double roundRadius = 0.0 }) {
 
     Widget img = CachedNetworkImage(
       placeholder: (context, url) {
@@ -39,11 +39,8 @@ class CommonWidgetBuilder {
       res = img;
     }
 
-    return Container(
-      padding: padding,
-      child: Center(
-        child: res,
-      )
+    return Center(
+      child: res,
     );
   }
 }
