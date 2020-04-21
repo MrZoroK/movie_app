@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:mockito/mockito.dart';
+import 'package:movie_app/config/constant.dart';
 import 'package:movie_app/models.dart';
 import 'package:test/test.dart';
 import 'package:http/http.dart';
@@ -14,8 +15,8 @@ void main() {
   group("MovieDbProvider", (){
     var client = MockClient();
     var movieDbProvider = MovieDbProvider(
-      apiKey: "a7b3c9975791294647265c71224a88ad",
-      baseUrl: "https://api.themoviedb.org/3",
+      apiKey: API_KEY,
+      baseUrl: API_BASE_URL,
       language: "en-US",
       client: client
     );

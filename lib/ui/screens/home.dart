@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:movie_app/config/constant.dart';
 
 import 'package:movie_app/config/movie_section.dart';
 import 'package:movie_app/blocs.dart';
@@ -124,7 +125,7 @@ class _HomeScreenState extends State<HomeScreen> {
     Rect cardShadowRect = MovieCardConfig.SHADOW_RECT * widthRatio;
 
     if (movie != null) {
-      imgUrl = "https://image.tmdb.org/t/p/original${movie.posterPath}";
+      imgUrl = IMAGE_BASE_URL + movie.posterPath;
       
       title = Column(
         children: <Widget>[
@@ -211,7 +212,7 @@ class _HomeScreenState extends State<HomeScreen> {
     String imgUrl;
     Size cardSize = TrendingCardConfig.SIZE * widthRatio;
     if (movie != null) {
-      imgUrl = "https://image.tmdb.org/t/p/original${movie.backdropPath}";
+      imgUrl = IMAGE_BASE_URL + movie.backdropPath;
     }
 
     return Padding(

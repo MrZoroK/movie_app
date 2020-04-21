@@ -6,14 +6,15 @@ import 'package:movie_app/blocs/bloc_provider.dart';
 import 'package:movie_app/blocs/home_bloc.dart';
 import 'package:movie_app/ui/screens/home.dart';
 
+import 'config/constant.dart';
 import 'resources.dart';
 import 'resources/movie_repository.dart';
 
 void setupDI() {
   GetIt.I.registerSingleton(Client());
   GetIt.I.registerSingleton(MovieDbProvider(
-    apiKey: "a7b3c9975791294647265c71224a88ad",
-    baseUrl: "https://api.themoviedb.org/3",
+    apiKey: API_KEY,
+    baseUrl: API_BASE_URL,
     language: "en-US",
     client: GetIt.I.get()
   ));

@@ -1,6 +1,7 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:movie_app/config/constant.dart';
 import 'package:movie_app/ui/screens/movie_detail_component/comment_item.dart';
 import 'package:movie_app/ui/widgets/video_widget.dart';
 
@@ -369,7 +370,7 @@ class _MovieDetailScreenState extends State<MovieDetailScreen> {
           Container(
             height: posterSize.height + 50,
             child: BoxShadowImage(
-              imgUrl: "https://image.tmdb.org/t/p/original${_bloc.movie.posterPath}",
+              imgUrl: IMAGE_BASE_URL + _bloc.movie.posterPath,
               size: posterSize, borderRadius: 6,
               shadowRect: POSTER_SHADOW_RECT * widthRatio,
               shadowBorderRadius: 6, shadowBlurRadius: 24,
@@ -413,7 +414,7 @@ class _MovieDetailScreenState extends State<MovieDetailScreen> {
     Widget child;
     if (cast != null) {
       if (cast.profilePath != null) {
-        imgUrl = "https://image.tmdb.org/t/p/original${cast.profilePath}";
+        imgUrl = IMAGE_BASE_URL + cast.profilePath;
       } else {
         child = Icon(
           Icons.person, size: castSize.width / 2,
@@ -562,7 +563,7 @@ class _MovieDetailScreenState extends State<MovieDetailScreen> {
     Size size = Size(100, 150) * widthRatio;
     double radius = 6.0;
     if (movie != null) {
-      imgUrl = "https://image.tmdb.org/t/p/original${movie.posterPath}";
+      imgUrl = IMAGE_BASE_URL + movie.posterPath;
       
       title = Container(
         alignment: Alignment.bottomCenter,
@@ -613,7 +614,7 @@ class _MovieDetailScreenState extends State<MovieDetailScreen> {
           Container(
             color: Colors.grey[300],
             child: CommonWidgetBuilder.loadNetworkImage(
-              "https://image.tmdb.org/t/p/original${_bloc.movie.backdropPath}",
+              IMAGE_BASE_URL + _bloc.movie.backdropPath,
               width: backdropSize.width, height: backdropSize.height,
             ),
           ),
