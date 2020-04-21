@@ -70,6 +70,18 @@ class MovieDbProvider {
     }
     return null;
   }
+  static List<Genre> _parseGenres(Uint8List responseBody) {
+    try {
+      var utf8String = utf8.decode(responseBody);
+      var jsObj = json.decode(utf8String);
+      if (jsObj != null) {
+        return (jsObj["genres"] as List)?.map((e) => e == null ? null : Genre.fromJson(e))?.toList();
+      }
+    } catch (e) {
+      developer.log('decode HttpResponse to Json failed', name: '_responseToJson', error: e);
+    }
+    return null;
+  }
   static List<ReviewDetail> _parseReviewDetails(String httpResp) {
     try {
       var httpDoc = parse(httpResp);
@@ -168,6 +180,16 @@ class MovieDbProvider {
     return http.get(url).then((resp) {
       if (resp != null && resp.statusCode == 200) {
         return compute(_parseReviewDetails, resp.body);
+      }
+      return null;
+    });
+  }
+
+  Future<List<Genre>> getGenres() {
+    String url = buildRequestUrl("/genre/movie/list");
+    return client.get(url).then((resp){
+      if (resp != null && resp.statusCode == 200) {
+        return compute(_parseGenres, resp.bodyBytes);
       }
       return null;
     });

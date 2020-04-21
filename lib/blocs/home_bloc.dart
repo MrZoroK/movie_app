@@ -11,9 +11,22 @@ class HomeBloc extends BlocBase {
   var _pageOfMoviesPublishers = List.generate(4, (index) => PublishSubject<PageOf<MovieBase>>());
   Stream<PageOf<MovieBase>> movies(MovieSection section) => _pageOfMoviesPublishers[section.index].stream;
 
+  var _genresPublisher = PublishSubject<PageOf<Genre>>();
+  Stream<PageOf<Genre>> get genres => _genresPublisher.stream;
+
   void loadMovies(MovieSection section, int page) {
     repository.getMovies(section, page: page).then((value){
-      _pageOfMoviesPublishers[section.index].sink.add(value);
+      if (!_pageOfMoviesPublishers[section.index].isClosed) {
+        _pageOfMoviesPublishers[section.index].sink.add(value);
+      }
+    });
+  }
+
+  void loadGenres() {
+    repository.getGenres().then((value){
+      if (!_genresPublisher.isClosed) {
+        _genresPublisher.sink.add(PageOf.fromList(value));
+      }
     });
   }
   @override
@@ -21,6 +34,7 @@ class HomeBloc extends BlocBase {
     _pageOfMoviesPublishers.forEach((element) {
       element.close();
     });
+    _genresPublisher.close();
   }
 
 }

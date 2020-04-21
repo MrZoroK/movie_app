@@ -30,4 +30,8 @@ class MovieRepository {
   Future<List<ReviewDetail>> getReviewsDetail(MovieBase movie) {
     return movieDbProvider.getReviewsDetail(movie);
   }
+
+  Future<List<Genre>> getGenres() {
+    return movieDbProvider.getGenres();
+  }
 }

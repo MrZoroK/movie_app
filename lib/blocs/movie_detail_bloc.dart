@@ -13,38 +13,41 @@ class MovieDetailBloc extends BlocBase {
 
   final MovieRepository repository = GetIt.I.get();
 
-  var _castsPublishers = PublishSubject<PageOf<Cast>>();
-  Stream<PageOf<Cast>> get casts => _castsPublishers.stream;
+  var _castsPublisher = PublishSubject<PageOf<Cast>>();
+  Stream<PageOf<Cast>> get casts => _castsPublisher.stream;
 
-  var _recommendationPublishers = PublishSubject<PageOf<MovieBase>>();
-  Stream<PageOf<MovieBase>> get recommendation => _recommendationPublishers.stream;
+  var _recommendationsPublisher = PublishSubject<PageOf<MovieBase>>();
+  Stream<PageOf<MovieBase>> get recommendation => _recommendationsPublisher.stream;
 
-  var _videosPublishers = PublishSubject<PageOf<Video>>();
-  Stream<PageOf<Video>> get videos => _videosPublishers.stream;
+  var _videosPublisher = PublishSubject<PageOf<Video>>();
+  Stream<PageOf<Video>> get videos => _videosPublisher.stream;
 
-  var _reviewsPublishers = PublishSubject<PageOf<Review>>();
-  Stream<PageOf<Review>> get reviews => _reviewsPublishers.stream;
+  var _reviewsPublisher = PublishSubject<PageOf<Review>>();
+  Stream<PageOf<Review>> get reviews => _reviewsPublisher.stream;
+
+  var _genresPublisher = PublishSubject<List<String>>();
+  Stream<List<String>> get genres => _genresPublisher.stream;
 
   void loadCasts() {
     repository.getCasts(movie.id).then((value){
-      if (!_castsPublishers.isClosed) {
-        _castsPublishers.sink.add(PageOf.fromList(value));
+      if (!_castsPublisher.isClosed) {
+        _castsPublisher.sink.add(PageOf.fromList(value));
       }
     });
   }
 
   void loadVideos() {
     repository.getVideos(movie.id).then((value){
-      if (!_videosPublishers.isClosed) {
-        _videosPublishers.sink.add(PageOf.fromList(value));
+      if (!_videosPublisher.isClosed) {
+        _videosPublisher.sink.add(PageOf.fromList(value));
       }
     });
   }
 
   void loadRecommendedMovies(int page) {
     repository.getRecommendedMovies(movie.id, page).then((value){
-      if (!_recommendationPublishers.isClosed) {
-        _recommendationPublishers.sink.add(value);
+      if (!_recommendationsPublisher.isClosed) {
+        _recommendationsPublisher.sink.add(value);
       }
     });
   }
@@ -58,8 +61,8 @@ class MovieDetailBloc extends BlocBase {
           }
         });
       });
-      if (!_reviewsPublishers.isClosed){
-         _reviewsPublishers.sink.add(value);
+      if (!_reviewsPublisher.isClosed){
+         _reviewsPublisher.sink.add(value);
       }
     });
   }
@@ -73,12 +76,30 @@ class MovieDetailBloc extends BlocBase {
       });
     }
   }
+  void loadGenres() {
+    repository.getGenres().then((allGenres){
+      List<String> movieGenres = List();
+      allGenres.forEach((genre) {
+        movie.genreIds.forEach((genreId) {
+          if (genre.id == genreId) {
+            movieGenres.add(genre.name);
+          }
+        });
+      });
+      movieGenres.sort((a, b) => a.length.compareTo(b.length));
+      
+      if (!_genresPublisher.isClosed) {
+        _genresPublisher.sink.add(movieGenres);
+      }
+    });
+  }
 
   @override
   void dispose() {
-    _castsPublishers.close();
-    _recommendationPublishers.close();
-    _videosPublishers.close();
-    _reviewsPublishers.close();
+    _castsPublisher.close();
+    _recommendationsPublisher.close();
+    _videosPublisher.close();
+    _reviewsPublisher.close();
+    _genresPublisher.close();
   }
 }

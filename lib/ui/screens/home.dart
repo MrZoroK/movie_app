@@ -69,11 +69,18 @@ class _HomeScreenState extends State<HomeScreen> {
       child: _buildTrending(),
     ));
 
+    children.add(
+      Padding(
+        padding: const EdgeInsets.only(bottom: SECTION_PADDING),
+        child: _buildCategorySection(),
+      )
+    );
+
     MovieSection.values.forEach((section) {
       if (section != MovieSection.RECOMMENDATIONS && section != MovieSection.TRENDING) {
         children.add(Padding(
           padding: const EdgeInsets.only(bottom: SECTION_PADDING),
-          child: _buildSection(section),
+          child: _buildMovieSection(section),
         ));
       }
     });
@@ -90,7 +97,7 @@ class _HomeScreenState extends State<HomeScreen> {
     return cardSize.height + MovieCardConfig.TITLE_HEIGHT;
   }
 
-  Widget _buildSection(MovieSection section) {
+  Widget _buildMovieSection(MovieSection section) {
     return SectionWidget(
       text: section.toText.toUpperCase(), sectionStyle: SectionStyle.HOME,
       list: ExpandableListView(
@@ -221,7 +228,69 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  
+  Widget _buildCategorySection() {
+    return SectionWidget(
+      text: "CATEGORY",
+      sectionStyle: SectionStyle.TRENDING,
+      list: ExpandableListView(
+        stream: _bloc.genres,
+        itemBuilder: (context, item){
+          return _buildCategoryCard(item);
+        },
+        onLoadMore: (_){
+          _bloc.loadGenres();
+        },
+        height: 80 * widthRatio,
+        dummySize: 2,
+      ),
+      onPressed: () {
+
+      },
+    );
+  }
+
+  Widget _buildCategoryCard(Genre genre) {
+    var cardSize = Size(140, 76) * widthRatio;
+    var shadowRect = const Rect.fromLTWH(8, 12.7, 123, 67.3) * widthRatio;
+    var genreTitle;
+    if (genre != null && genre.name != null) {
+      genreTitle = Container(
+        alignment: Alignment.center,
+        width: cardSize.width, height: cardSize.height,
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            stops: [0.0, 1.0],
+            colors: [Color(0xFF00CBCF).withOpacity(0.5), Color(0xFF007AD9).withOpacity(0.5)]
+          ),
+          borderRadius: BorderRadius.circular(6)
+        ),
+        child: Text(
+          genre.name,
+          style: TextStyle(
+            color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold
+          ),
+        ),
+      );
+    } else {
+      genreTitle = Container();
+    }
+    return Padding(
+      padding: TrendingCardConfig.PADDING,
+      child: InkWell(
+        child: BoxShadowImage(
+          child: genreTitle,
+          size: cardSize, borderRadius: 6,
+          shadowRect: shadowRect,
+          shadowBorderRadius: 5.3, shadowBlurRadius: 24,
+        ),
+        onTap: (){
+          //TODO: goto category screen
+        },
+      ),
+    );
+  }
 
   Widget _topbar(BuildContext context) {
     var appBar = AppBar(

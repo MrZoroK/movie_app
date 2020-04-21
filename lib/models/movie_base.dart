@@ -33,6 +33,8 @@ class MovieBase {
   String posterPath;
   @JsonKey(name: "backdrop_path")
   String backdropPath;
+  @JsonKey(name: "genre_ids")
+  List<int> genreIds;
   
 
   factory MovieBase.fromJson(Map<String, dynamic> json) => _$MovieBaseFromJson(json);
@@ -44,7 +46,8 @@ class MovieBase {
     this.voteAverage,
     this.releaseDate,
     this.posterPath,
-    this.backdropPath});
+    this.backdropPath,
+    this.genreIds});
 
   double get voteRate => (voteAverage / 10) * 5;
   String get formatedReleaseDate {

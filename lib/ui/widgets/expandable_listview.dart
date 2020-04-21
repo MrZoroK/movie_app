@@ -18,6 +18,7 @@ class ExpandableListView<T> extends StatefulWidget {
   final int dummySize;
   final Axis scrollDirection;
   final double verticalItemHeight;
+  final bool pullToRefresh;
 
   ExpandableListView({
     @required this.stream,
@@ -26,7 +27,8 @@ class ExpandableListView<T> extends StatefulWidget {
     @required this.height,
     this.dummySize = 3,
     this.scrollDirection = Axis.horizontal,
-    this.verticalItemHeight = 0
+    this.verticalItemHeight = 0,
+    this.pullToRefresh = true
   });
 
   @override
@@ -87,7 +89,7 @@ class _ExpandableListViewState<T> extends State<ExpandableListView> with Automat
               }
             },
           ),
-          _refreshIndicator()
+          widget.pullToRefresh ? _refreshIndicator() : Container()
         ],
       ),
     );
@@ -136,6 +138,9 @@ class _ExpandableListViewState<T> extends State<ExpandableListView> with Automat
       height: calcHeight(itemCount),
       child: Listener(
         onPointerMove: (event) async {
+          if (!widget.pullToRefresh) {
+            return;
+          }
           if (widget.scrollDirection == Axis.horizontal) {
             if (event.delta.dx > 5.0 && _scrollCtrler.position.pixels == _scrollCtrler.position.minScrollExtent) {
               _streamCtrler.add(true);
@@ -145,7 +150,6 @@ class _ExpandableListViewState<T> extends State<ExpandableListView> with Automat
               _streamCtrler.add(true);
             }
           }
-          
         },
         child: ListView.builder(
           itemCount: itemCount,

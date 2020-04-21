@@ -9,6 +9,7 @@ import 'package:movie_app/blocs.dart';
 import 'package:movie_app/models.dart';
 import 'package:movie_app/utils.dart';
 import 'package:provider/provider.dart';
+import 'package:shimmer/shimmer.dart';
 
 class CastCardConfig {
   static const SIZE = const Size(70, 102);
@@ -252,6 +253,84 @@ class _MovieDetailScreenState extends State<MovieDetailScreen> {
     );
   }
 
+  List<List<String>> _calcGenreTable(List<String> genres) {
+    List<List<String>> table = List();
+    List<String> row = List();
+    int countCharacter = 0;
+    for (int i = 0; i < genres.length; i++) {
+      var genre = genres[i];
+      if (countCharacter + genre.length <= 20) {
+        row.add(genre);
+        countCharacter += genre.length;
+      } else {
+        table.add(row);
+        row = List()..add(genre);
+        countCharacter = 0;
+      }
+      if (i == genres.length - 1) {
+        table.add(row);
+      }
+    }
+    return table;
+  }
+  Widget _buildGenresLayout(List<String> genres) {
+    Widget genresLayout;
+    if (genres == null) {
+      var decor = BoxDecoration(
+        color: Colors.grey[300],
+        borderRadius: BorderRadius.circular(8)
+      );
+      genresLayout = Shimmer.fromColors(
+        baseColor: Colors.grey[300],
+        highlightColor: Colors.grey[50],
+        child: Row(
+          children: <Widget>[
+            Container(
+              margin: EdgeInsets.only(right: 5),
+              width: 35, height: 25,
+              decoration: decor,
+            ),
+            Container(
+              width: 50, height: 25,
+              decoration: decor,
+            )
+          ],
+        ),
+      );
+    } else {
+      var tableOfGenreNames = _calcGenreTable(genres);
+      genresLayout = Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: List.generate(tableOfGenreNames.length, (colIdx){
+          var rows = tableOfGenreNames[colIdx];
+          return Padding(
+            padding: const EdgeInsets.only(bottom: 2),
+            child: Row(
+              children: List.generate(rows.length, (rowIdx){
+                var genre = rows[rowIdx];
+                return Container(
+                  padding: EdgeInsets.only(left: 11, right: 11, top: 2, bottom: 5),
+                  margin: EdgeInsets.only(right: 5),
+                  decoration: BoxDecoration(
+                    color: Color(0xFF007AD9),
+                    borderRadius: BorderRadius.circular(8)
+                  ),
+                  child: Text(
+                    genre,
+                    style: TextStyle(fontSize: 12, color: Colors.white),
+                  ),
+                );
+              })
+            ),
+          );
+        })
+      );
+    }
+    return Container(
+        margin: EdgeInsets.only(top: 9),
+        child: genresLayout
+    );
+  }
   Widget _buildRateAndGenres() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -261,6 +340,17 @@ class _MovieDetailScreenState extends State<MovieDetailScreen> {
           _bloc.movie.formatedReleaseDate,
           style: TextStyle(
             fontSize: 14, color: TITLE_COLOR
+          ),
+        ),
+        StreamProvider<List<String>>(
+          create: (_){
+            _bloc.loadGenres();
+            return _bloc.genres;
+          },
+          child: Consumer<List<String>>(
+            builder: (context, genres, _){
+              return _buildGenresLayout(genres);
+            },
           ),
         )
       ],
@@ -329,7 +419,6 @@ class _MovieDetailScreenState extends State<MovieDetailScreen> {
           Icons.person, size: castSize.width / 2,
         );
       }
-      
       
       title = Container(
         width: castSize.width,
@@ -422,9 +511,10 @@ class _MovieDetailScreenState extends State<MovieDetailScreen> {
         },
         verticalItemHeight: 140,
         scrollDirection: Axis.vertical,
+        pullToRefresh: false,
         onLoadMore: (page) => _bloc.loadReviews(page),
         dummySize: 1,
-        height: 450,
+        height: 450
       ),
     );
   }
