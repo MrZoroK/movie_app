@@ -370,7 +370,7 @@ class _MovieDetailScreenState extends State<MovieDetailScreen> {
           Container(
             height: posterSize.height + 50,
             child: BoxShadowImage(
-              imgUrl: IMAGE_BASE_URL + _bloc.movie.posterPath,
+              imgUrl: getFullImageUrl(_bloc.movie.posterPath),
               size: posterSize, borderRadius: 6,
               shadowRect: POSTER_SHADOW_RECT * widthRatio,
               shadowBorderRadius: 6, shadowBlurRadius: 24,
@@ -414,7 +414,7 @@ class _MovieDetailScreenState extends State<MovieDetailScreen> {
     Widget child;
     if (cast != null) {
       if (cast.profilePath != null) {
-        imgUrl = IMAGE_BASE_URL + cast.profilePath;
+        imgUrl = getFullImageUrl(cast.profilePath);
       } else {
         child = Icon(
           Icons.person, size: castSize.width / 2,
@@ -563,7 +563,7 @@ class _MovieDetailScreenState extends State<MovieDetailScreen> {
     Size size = Size(100, 150) * widthRatio;
     double radius = 6.0;
     if (movie != null) {
-      imgUrl = IMAGE_BASE_URL + movie.posterPath;
+      imgUrl = getFullImageUrl(movie.posterPath);
       
       title = Container(
         alignment: Alignment.bottomCenter,
@@ -614,7 +614,7 @@ class _MovieDetailScreenState extends State<MovieDetailScreen> {
           Container(
             color: Colors.grey[300],
             child: CommonWidgetBuilder.loadNetworkImage(
-              IMAGE_BASE_URL + _bloc.movie.backdropPath,
+              getFullImageUrl(_bloc.movie.backdropPath),
               width: backdropSize.width, height: backdropSize.height,
             ),
           ),

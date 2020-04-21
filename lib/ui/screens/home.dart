@@ -125,7 +125,7 @@ class _HomeScreenState extends State<HomeScreen> {
     Rect cardShadowRect = MovieCardConfig.SHADOW_RECT * widthRatio;
 
     if (movie != null) {
-      imgUrl = IMAGE_BASE_URL + movie.posterPath;
+      imgUrl = getFullImageUrl(movie.posterPath);
       
       title = Column(
         children: <Widget>[
@@ -212,7 +212,7 @@ class _HomeScreenState extends State<HomeScreen> {
     String imgUrl;
     Size cardSize = TrendingCardConfig.SIZE * widthRatio;
     if (movie != null) {
-      imgUrl = IMAGE_BASE_URL + movie.backdropPath;
+      imgUrl = getFullImageUrl(movie.backdropPath);
     }
 
     return Padding(
