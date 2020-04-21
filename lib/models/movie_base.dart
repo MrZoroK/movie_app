@@ -2,6 +2,22 @@
 import 'package:json_annotation/json_annotation.dart';
 part 'movie_base.g.dart';
 
+enum MonthName {
+  January,February,March,April,May,June,
+  July,August,September,October,November,December
+}
+extension DateTimeEx on DateTime {
+  String get monthAndYear {
+    String strMonth = "";
+    MonthName.values.forEach((element) {
+      if (element.index + 1 == month) {
+        strMonth = element.toString().replaceAll("MonthName.", "");
+      }
+    });
+    return strMonth + " $year";
+  }
+}
+
 @JsonSerializable()
 class MovieBase {
   int id;
@@ -11,7 +27,7 @@ class MovieBase {
   @JsonKey(name: "vote_average")
   double voteAverage;
   @JsonKey(name: "release_date")
-  DateTime releaseDate;
+  String releaseDate;
 
   @JsonKey(name: "poster_path")
   String posterPath;
@@ -31,4 +47,16 @@ class MovieBase {
     this.backdropPath});
 
   double get voteRate => (voteAverage / 10) * 5;
+  String get formatedReleaseDate {
+    var ymd = releaseDate.split("-");
+    var year = ymd[0];
+    var month = int.parse(ymd[1]);
+    String strMonth = "";
+    MonthName.values.forEach((element) {
+      if (element.index + 1 == month) {
+        strMonth = element.toString().replaceAll("MonthName.", "");
+      }
+    });
+    return strMonth + " $year";
+  }
 }

@@ -1,6 +1,7 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:movie_app/ui/screens/movie_detail_component/comment_item.dart';
 import 'package:movie_app/ui/widgets/video_widget.dart';
 
 import 'package:movie_app/uis.dart';
@@ -56,7 +57,7 @@ class _MovieDetailScreenState extends State<MovieDetailScreen> {
       _widthRatio = MediaQuery.of(context).size.width / DESIGNED_WIDTH;
     }
     return _widthRatio;
-  } 
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -255,22 +256,9 @@ class _MovieDetailScreenState extends State<MovieDetailScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
-        Row(
-          children: <Widget>[
-            Padding(
-              padding: const EdgeInsets.only(right: 10),
-              child: Text(
-                _bloc.movie.voteRate.toStringAsPrecision(2),
-                style: TextStyle(
-                  fontWeight: FontWeight.bold, fontSize: 18, color: Color(0xFFF1CA23),
-                )
-              ),
-            ),
-            VoteStar(rating: _bloc.movie.voteRate, size: 15, starAlign: 7),
-          ],
-        ),
+        VoteStar(rating: _bloc.movie.voteRate, size: 15, starAlign: 7),
         Text(
-          _bloc.movie.releaseDate.monthAndYear,
+          _bloc.movie.formatedReleaseDate,
           style: TextStyle(
             fontSize: 14, color: TITLE_COLOR
           ),
@@ -322,6 +310,7 @@ class _MovieDetailScreenState extends State<MovieDetailScreen> {
           //to refresh
           _bloc.loadCasts();
         },
+        dummySize: 4,
         height: _castSecionHeight,
       ),
     );
@@ -429,60 +418,13 @@ class _MovieDetailScreenState extends State<MovieDetailScreen> {
       list: ExpandableListView(
         stream: _bloc.reviews,
         itemBuilder: (context, item){
-          return _buildCommentItem(item);
+          return CommentItem(item);
         },
-        verticalItemHeight: 120,
+        verticalItemHeight: 140,
         scrollDirection: Axis.vertical,
         onLoadMore: (page) => _bloc.loadReviews(page),
-        height: 300,
-      ),
-    );
-  }
-
-  Widget _buildCommentItem(Review review) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 20.0),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          Container(
-            width: 40, height: 40,
-            margin: EdgeInsets.all(5),
-            decoration: BoxDecoration (
-              border: Border.all(),
-              borderRadius: BorderRadius.circular(40)
-            ),
-            child: Icon(
-              Icons.person
-            ),
-          ),
-          Container(
-            width: 300 * widthRatio,
-            padding: EdgeInsets.only(left: 10),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                Text(
-                 review == null ? "" : review.author,
-                 style: TextStyle(color: Color(0xFF4A4A4A), fontWeight: FontWeight.bold),
-                ),
-                Container(
-                  height: 40,
-                  child: Text(
-                    review == null ? "" : review.content,
-                    style: TextStyle(color: Color(0xFF4A4A4A)),
-                    maxLines: 2, overflow: TextOverflow.ellipsis,
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(top: 13),
-                  child: Divider(color: Color(0xFFE1E1E1), height: 3),
-                )
-              ],
-            ),
-          ),
-          
-        ],
+        dummySize: 1,
+        height: 450,
       ),
     );
   }
@@ -518,6 +460,7 @@ class _MovieDetailScreenState extends State<MovieDetailScreen> {
         onLoadMore: (nextPage){
           _bloc.loadRecommendedMovies(nextPage);
         },
+        dummySize: 3,
         height: 230,
       ),
     );

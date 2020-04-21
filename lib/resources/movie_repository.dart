@@ -26,4 +26,8 @@ class MovieRepository {
   Future<PageOf<Review>> getReviews(int movieId, int page) {
     return movieDbProvider.getReviews(movieId, page);
   }
+
+  Future<List<ReviewDetail>> getReviewsDetail(MovieBase movie) {
+    return movieDbProvider.getReviewsDetail(movie);
+  }
 }

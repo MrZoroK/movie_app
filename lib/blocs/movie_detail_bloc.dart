@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:get_it/get_it.dart';
 import 'package:movie_app/models.dart';
 import 'package:movie_app/resources/movie_repository.dart';
@@ -9,6 +7,7 @@ import '../blocs.dart';
 
 class MovieDetailBloc extends BlocBase {
   final MovieBase movie;
+  List<ReviewDetail> _listReviewDetails = List();
 
   MovieDetailBloc(this.movie);
 
@@ -28,28 +27,53 @@ class MovieDetailBloc extends BlocBase {
 
   void loadCasts() {
     repository.getCasts(movie.id).then((value){
-      _castsPublishers.sink.add(PageOf.fromList(value));
+      if (!_castsPublishers.isClosed) {
+        _castsPublishers.sink.add(PageOf.fromList(value));
+      }
     });
   }
 
   void loadVideos() {
     repository.getVideos(movie.id).then((value){
-      _videosPublishers.sink.add(PageOf.fromList(value));
+      if (!_videosPublishers.isClosed) {
+        _videosPublishers.sink.add(PageOf.fromList(value));
+      }
     });
   }
 
   void loadRecommendedMovies(int page) {
     repository.getRecommendedMovies(movie.id, page).then((value){
-      _recommendationPublishers.sink.add(value);
+      if (!_recommendationPublishers.isClosed) {
+        _recommendationPublishers.sink.add(value);
+      }
     });
   }
 
-  void loadReviews(int page) {
+  void _internalLoadReviews(int page) {
     repository.getReviews(movie.id, page).then((value){
-      _reviewsPublishers.sink.add(value);
+      value.items.forEach((review) {
+        _listReviewDetails.forEach((detail) {
+          if (review.id == detail.id) {
+            review.detail = detail;
+          }
+        });
+      });
+      if (!_reviewsPublishers.isClosed){
+         _reviewsPublishers.sink.add(value);
+      }
     });
   }
-  
+  void loadReviews(int page) {
+    if (_listReviewDetails.length > 0) {
+      _internalLoadReviews(page);
+    } else {
+      repository.getReviewsDetail(movie).then((value){
+         _listReviewDetails = value;
+        _internalLoadReviews(page);
+      });
+    }
+  }
+
   @override
   void dispose() {
     _castsPublishers.close();
