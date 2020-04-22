@@ -402,6 +402,7 @@ class _MovieDetailScreenState extends State<MovieDetailScreen> {
           _bloc.loadCasts();
         },
         dummySize: 4,
+        pullToRefresh: false,
         height: _castSecionHeight,
       ),
     );
@@ -478,6 +479,7 @@ class _MovieDetailScreenState extends State<MovieDetailScreen> {
           //to refresh
           _bloc.loadVideos();
         },
+        pullToRefresh: false,
         height: 180,
       ),
     );

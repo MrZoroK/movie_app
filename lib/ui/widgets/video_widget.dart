@@ -65,13 +65,19 @@ class _VideoWidgetState extends State<VideoWidget> {
                 readyState.val = VideoState.FAILED;
               }
             });
+            _controller.addListener(() {
+              if (_controller.value.isPlaying) {
+                readyState.val = VideoState.PLAYING;
+              } else if (_controller.value.initialized) {
+                readyState.val = VideoState.READY;
+              }
+            });
           }
         });
         return readyState;
       },
       child: Consumer<ReadyPlayState>(
-        child: VideoPlayer(_controller),
-        builder: (context, state, videoPlayerWidget){
+        builder: (context, state, _){
           Widget videoPlayer;
           if (state.val == VideoState.LOADING) {
             videoPlayer = CircularProgressIndicator();
@@ -90,14 +96,19 @@ class _VideoWidgetState extends State<VideoWidget> {
             }
             videoPlayer = Stack(
               children: <Widget>[
-                videoPlayerWidget,
+                VideoPlayer(_controller),
                 InkWell(
                   child: overlayButton,
                   onTap: () {
                     if (state.val == VideoState.PLAYING && _controller.value.isPlaying) {
                       _controller.pause();
                     } else {
-                      _controller.play();
+                      if(_controller.value.position == _controller.value.duration) {
+                        _controller.seekTo(Duration(seconds: 0, minutes: 0, hours: 0));
+                        _controller.play();
+                      } else {
+                        _controller.play();
+                      }
                     }
                   }
                 )
