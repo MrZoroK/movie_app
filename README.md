@@ -13,8 +13,8 @@
 3. SETUP:
     - Install flutter, use stable channel
     - At the first time, run "flutter pub run build_runner build"
-        => This will generate JsonSerializable models
-        => Also run when you have any change of model structures
+        -> This will generate JsonSerializable models
+        -> Also need to run when have any change of model structures
 
 4. DESIGN PATTERNS:
     - Use Bloc: to architect the project. The diagram should look like:
@@ -24,22 +24,25 @@
                                                 |====> CacheProvider
     -------------------------------------------------------------------
 
-    - Dependence Injection: use GetIt, a simple service locator
-    - State Management: use Provider, Streaming to handle the update scenario of a model/widget
+    - Dependency Injection: use GetIt - a simple service locator
+    - State Management: use Provider, Streaming (rxdart) to handle the update scenario of a model/widget
 
 5. BEST PRACTICES:
-    - Use SVG file for assets when applicable for better scaling
-    - Use Isolate(threading in Flutter) for parsing large json files to reduce micro freeze
+    - Use SVG file for assets when applicable
+      --> For better scaling on large screen resolution
+    - Use Isolate(threading in Flutter) for parsing large json files
+      --> To reduce micro-freeze while fetching data in the background
     - Caching assets for network requests based on "cache-control", "etag" responded from server
+      --> Can use the app even when offline or API service down
 
 
 6. PROBLEMS:
     - API doesn't provide me (or maybe I can't find yet) some info below according to the mockup:
-        + (1) "Comments" section in Detail:
-                ==> No user's avatar, the rating number, and the date reviewed
-        + (2) "Category" section in Home:
-                ==> No picture for each category
-    - (3) Video section: the Video Player plugin provided by Flutter team doesn't support to play youtube video
+        + (1) "Comments" section in Detail screen:
+                --> No user's avatar, the rating number, and the date reviewed
+        + (2) "Category" section in Home screen:
+                --> No background picture for each category
+    - (3) Video section: the Video Player plugin provided by Flutter team doesn't support to play youtube videos
 7. SOLUTIONS:
     - (1) Fetched user's comments info by loading and parsing html page from https://www.themoviedb.org/movie/<id>-<title>/reviews
     - (2) No solution for the pictures of Category
