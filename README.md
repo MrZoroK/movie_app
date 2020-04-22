@@ -21,7 +21,7 @@
     -------------------------------------------------------------------
                                                 |====> ApiProvider
         UI <=====> Bloc <=====> Repository <====|
-                                           |    |====> CacheProvider
+                                                |====> CacheProvider
     -------------------------------------------------------------------
 
     - Dependence Injection: use GetIt, a simple service locator
