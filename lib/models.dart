@@ -6,3 +6,4 @@ export 'models/genre.dart';
 export 'models/cast.dart';
 export 'models/review.dart';
 export 'models/review_detail.dart';
+export 'models/video_detail.dart';

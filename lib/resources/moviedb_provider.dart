@@ -58,6 +58,18 @@ class MovieDbProvider {
     }
     return null;
   }
+  static List<VideoDetail> _parseVideoDetails(Uint8List responseBody) {
+    try {
+      var utf8String = utf8.decode(responseBody);
+      var jsObj = json.decode(utf8String);
+      if (jsObj != null) {
+        return (jsObj["results"] as List)?.map((e) => e == null ? null : VideoDetail.fromJson(e))?.toList();
+      }
+    } catch (e) {
+      developer.log('decode HttpResponse to Json failed', name: '_responseToJson', error: e);
+    }
+    return null;
+  }
   static PageOf<Review> _parseReviews(Uint8List responseBody) {
     try {
       var utf8String = utf8.decode(responseBody);
@@ -138,6 +150,8 @@ class MovieDbProvider {
         return compute(_parseMoviePage, resp.bodyBytes);
       }
       return null;
+    }).catchError((onError){
+      return null;
     });
   }
 
@@ -148,6 +162,8 @@ class MovieDbProvider {
         return compute(_parseVideos, resp.bodyBytes);
       }
       return null;
+    }).catchError((onError){
+      return null;
     });
   }
 
@@ -157,6 +173,20 @@ class MovieDbProvider {
       if (resp != null && resp.statusCode == 200) {
         return compute(_parseCasts, resp.bodyBytes);
       }
+      return null;
+    }).catchError((onError){
+      return null;
+    });
+  }
+
+  Future<List<VideoDetail>> getVideoDetails(String videoId) {
+    String url = "https://us-central1-get-utube-link.cloudfunctions.net/getYoutubeDownloadInfo?video_id=$videoId";
+    return client.get(url).then((resp){
+      if (resp != null && resp.statusCode == 200) {
+        return compute(_parseVideoDetails, resp.bodyBytes);
+      }
+      return null;
+    }).catchError((onError){
       return null;
     });
   }
@@ -171,6 +201,8 @@ class MovieDbProvider {
         return compute(_parseReviews, resp.bodyBytes);
       }
       return null;
+    }).catchError((onError){
+      return null;
     });
   }
 
@@ -182,6 +214,8 @@ class MovieDbProvider {
         return compute(_parseReviewDetails, resp.body);
       }
       return null;
+    }).catchError((onError){
+      return null;
     });
   }
 
@@ -191,6 +225,8 @@ class MovieDbProvider {
       if (resp != null && resp.statusCode == 200) {
         return compute(_parseGenres, resp.bodyBytes);
       }
+      return null;
+    }).catchError((onError){
       return null;
     });
   }

@@ -34,4 +34,8 @@ class MovieRepository {
   Future<List<Genre>> getGenres() {
     return movieDbProvider.getGenres();
   }
+
+  Future<List<VideoDetail>> getVideoDetails(String videoId) {
+    return movieDbProvider.getVideoDetails(videoId);
+  }
 }

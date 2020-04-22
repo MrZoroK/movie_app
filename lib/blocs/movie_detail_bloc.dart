@@ -44,6 +44,15 @@ class MovieDetailBloc extends BlocBase {
     });
   }
 
+  Future<String> loadVideoUrl(String videoId) {
+    return repository.getVideoDetails(videoId).then((videoDetails){
+      if (videoDetails != null && videoDetails.length > 0) {
+        return videoDetails[0].url;
+      }
+      return "";
+    });
+  }
+
   void loadRecommendedMovies(int page) {
     repository.getRecommendedMovies(movie.id, page).then((value){
       if (!_recommendationsPublisher.isClosed) {
