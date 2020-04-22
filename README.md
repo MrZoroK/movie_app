@@ -15,8 +15,12 @@
     - At the first time, run "flutter pub run build_runner build"
         -> This will generate JsonSerializable models
         -> Also need to run when have any change of model structures
+        
+4. RUN & TEST:
+    - Developed, ran and tested on Samsung device (Android 9)
+    - Have NOT built, tested, and run on any iOS device.
 
-4. DESIGN PATTERNS:
+5. DESIGN PATTERNS:
     - Use Bloc: to architect the project. The diagram should look like:
     -------------------------------------------------------------------
                                                 |====> ApiProvider
@@ -27,7 +31,7 @@
     - Dependency Injection: use GetIt - a simple service locator
     - State Management: use Provider, Streaming (rxdart) to handle the update scenario of a model/widget
 
-5. BEST PRACTICES:
+6. BEST PRACTICES:
     - Use SVG file for assets when applicable
       --> For better scaling on large screen resolution
     - Use Isolate(threading in Flutter) for parsing large json files
@@ -36,29 +40,29 @@
       --> Can use the app even when offline or API service down
 
 
-6. PROBLEMS:
+7. PROBLEMS:
     - API doesn't provide me (or maybe I can't find yet) some info below according to the mockup:
         + (1) "Comments" section in Detail screen:
                 --> No user's avatar, the rating number, and the date reviewed
         + (2) "Category" section in Home screen:
                 --> No background picture for each category
     - (3) Video section: the Video Player plugin provided by Flutter team doesn't support to play youtube videos
-7. SOLUTIONS:
+8. SOLUTIONS:
     - (1) Fetched user's comments info by loading and parsing html page from https://www.themoviedb.org/movie/<id>-<title>/reviews
     - (2) No solution for the pictures of Category
     - (3) Build an API using Node.js on google cloud function to get MP4 stream from youtube link
         + API url: https://us-central1-get-utube-link.cloudfunctions.net/getYoutubeDownloadInfo?video_id=<youtube_id>
         + Use 3rd party package to build it: https://www.npmjs.com/package/ytdl-core
 
-8. KNOWN ISSUES:
+9. KNOWN ISSUES:
     - Use gradiant background color for CATEGORY as API doesn't provide background picture
     - Text displaying on the app would be sightly different with the mockup since the requirement asks to use Helvetica font, but the mockup use 2 different fonts: Open Sans and Helvetica
 
-9. UNIT TESTS: 
+10. UNIT TESTS: 
     Only provide tests for the api provider, model parser
 
 
-10. Third party packages:
+11. Third party packages:
     get_it:                     https://pub.dev/packages/get_it
     json_annotation:            https://pub.dev/packages/json_annotation
     flutter_svg:                https://pub.dev/packages/flutter_svg
