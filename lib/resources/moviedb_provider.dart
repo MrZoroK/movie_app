@@ -3,6 +3,8 @@ import 'dart:typed_data';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:html/parser.dart';
+import 'package:http/http.dart';
+import 'package:movie_app/resources.dart';
 import 'dart:developer' as developer;
 
 import '../models.dart';
@@ -12,7 +14,8 @@ class MovieDbProvider {
   final String baseUrl;
   final String language;
   final http.Client client;
-  MovieDbProvider({ this.apiKey, this.baseUrl, this.language = "en-US", this.client });
+  final NetworkCacheProvider networkCache;
+  MovieDbProvider({ this.apiKey, this.baseUrl, this.language = "en-US", this.client, this.networkCache});
 
   String buildRequestUrl(String path, { Map<String, dynamic> params }) {
     String url = baseUrl + path + "?api_key=$apiKey&language=$language";
@@ -143,9 +146,32 @@ class MovieDbProvider {
     return null;
   }
 
-  Future<PageOf<MovieBase>> getMovies(String path, int page) {
+  Future<Response> _fetchUrl(String url, {bool cache = true}) {
+    if (!cache) {
+      return client.get(url).then((resp) async {
+        if (resp == null || resp.statusCode != 200 && networkCache != null) {
+          return networkCache.get(url);
+        } else {
+          if (resp.statusCode == 200) {
+            await networkCache.put(url, resp);
+          }
+          return resp;
+        }
+      }).catchError((err){
+        return networkCache.get(url);
+      });
+    } else {
+      if (networkCache != null) {
+        return networkCache.get(url);
+      } else {
+        return client.get(url);
+      }
+    }
+  }
+
+  Future<PageOf<MovieBase>> getMovies(String path, int page, {bool useCache = true}) {
     String url = buildRequestUrl(path, params: { "page": page} );
-    return client.get(url).then((resp){
+    return _fetchUrl(url, cache: useCache).then((resp){
       if (resp != null && resp.statusCode == 200) {
         return compute(_parseMoviePage, resp.bodyBytes);
       }
@@ -155,9 +181,9 @@ class MovieDbProvider {
     });
   }
 
-  Future<List<Video>> getVideos(int movieId) {
+  Future<List<Video>> getVideos(int movieId, {bool useCache = true}) {
     String url = buildRequestUrl("/movie/$movieId/videos");
-    return client.get(url).then((resp){
+    return _fetchUrl(url, cache: useCache).then((resp){
       if (resp != null && resp.statusCode == 200) {
         return compute(_parseVideos, resp.bodyBytes);
       }
@@ -167,9 +193,9 @@ class MovieDbProvider {
     });
   }
 
-  Future<List<Cast>> getCasts(int movieId) {
+  Future<List<Cast>> getCasts(int movieId, {bool useCache = true}) {
     String url = buildRequestUrl("/movie/$movieId/credits");
-    return client.get(url).then((resp){
+    return _fetchUrl(url, cache: useCache).then((resp){
       if (resp != null && resp.statusCode == 200) {
         return compute(_parseCasts, resp.bodyBytes);
       }
@@ -179,9 +205,9 @@ class MovieDbProvider {
     });
   }
 
-  Future<List<VideoDetail>> getVideoDetails(String videoId) {
+  Future<List<VideoDetail>> getVideoDetails(String videoId, {bool useCache = true}) {
     String url = "https://us-central1-get-utube-link.cloudfunctions.net/getYoutubeDownloadInfo?video_id=$videoId";
-    return client.get(url).then((resp){
+    return _fetchUrl(url, cache: useCache).then((resp){
       if (resp != null && resp.statusCode == 200) {
         return compute(_parseVideoDetails, resp.bodyBytes);
       }
@@ -191,12 +217,12 @@ class MovieDbProvider {
     });
   }
 
-  Future<PageOf<Review>> getReviews(int movieId, int page) {
+  Future<PageOf<Review>> getReviews(int movieId, int page, {bool useCache = true}) {
     String url = buildRequestUrl("/movie/$movieId/reviews",
                                   params: {
                                     "page": page
                                   });
-    return client.get(url).then((resp){
+    return _fetchUrl(url, cache: useCache).then((resp){
       if (resp != null && resp.statusCode == 200) {
         return compute(_parseReviews, resp.bodyBytes);
       }
@@ -206,10 +232,10 @@ class MovieDbProvider {
     });
   }
 
-  Future<List<ReviewDetail>> getReviewsDetail(MovieBase movie) {
+  Future<List<ReviewDetail>> getReviewsDetail(MovieBase movie, {bool useCache = true}) {
     String tile = movie.title.replaceAll(" ", "-").replaceAll(":", "").toLowerCase();
     String url = "https://www.themoviedb.org/movie/${movie.id}-$tile/reviews";
-    return http.get(url).then((resp) {
+    return _fetchUrl(url, cache: useCache).then((resp) {
       if (resp != null && resp.statusCode == 200) {
         return compute(_parseReviewDetails, resp.body);
       }
@@ -219,9 +245,9 @@ class MovieDbProvider {
     });
   }
 
-  Future<List<Genre>> getGenres() {
+  Future<List<Genre>> getGenres({bool useCache = true}) {
     String url = buildRequestUrl("/genre/movie/list");
-    return client.get(url).then((resp){
+    return _fetchUrl(url, cache: useCache).then((resp){
       if (resp != null && resp.statusCode == 200) {
         return compute(_parseGenres, resp.bodyBytes);
       }

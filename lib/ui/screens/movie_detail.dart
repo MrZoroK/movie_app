@@ -344,8 +344,8 @@ class _MovieDetailScreenState extends State<MovieDetailScreen> {
           ),
         ),
         StreamProvider<List<String>>(
-          create: (_){
-            _bloc.loadGenres();
+          create: (_,){
+            _bloc.loadGenres(true);
             return _bloc.genres;
           },
           child: Consumer<List<String>>(
@@ -397,9 +397,9 @@ class _MovieDetailScreenState extends State<MovieDetailScreen> {
         itemBuilder: (context, item){
           return _buildCastCard(item);
         },
-        onLoadMore: (_){
+        onLoadMore: (_, fromCache){
           //to refresh
-          _bloc.loadCasts();
+          _bloc.loadCasts(fromCache);
         },
         dummySize: 4,
         pullToRefresh: false,
@@ -475,9 +475,9 @@ class _MovieDetailScreenState extends State<MovieDetailScreen> {
         itemBuilder: (context, item){
           return _buildVideoCard(item);
         },
-        onLoadMore: (_){
+        onLoadMore: (_, fromCache){
           //to refresh
-          _bloc.loadVideos();
+          _bloc.loadVideos(fromCache);
         },
         pullToRefresh: false,
         height: 180,
@@ -515,7 +515,7 @@ class _MovieDetailScreenState extends State<MovieDetailScreen> {
         verticalItemHeight: 140,
         scrollDirection: Axis.vertical,
         pullToRefresh: false,
-        onLoadMore: (page) => _bloc.loadReviews(page),
+        onLoadMore: (page, fromCache) => _bloc.loadReviews(page, fromCache),
         dummySize: 1,
         height: 450
       ),
@@ -550,8 +550,8 @@ class _MovieDetailScreenState extends State<MovieDetailScreen> {
             onTap: () => _gotoMovieDetailScreen(item),
           );
         },
-        onLoadMore: (nextPage){
-          _bloc.loadRecommendedMovies(nextPage);
+        onLoadMore: (nextPage, fromCache){
+          _bloc.loadRecommendedMovies(nextPage, fromCache);
         },
         dummySize: 3,
         height: 230,

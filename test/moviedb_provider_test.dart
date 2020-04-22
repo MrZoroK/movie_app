@@ -1,9 +1,9 @@
 import 'dart:io';
 
+import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
 import 'package:movie_app/config/constant.dart';
 import 'package:movie_app/models.dart';
-import 'package:test/test.dart';
 import 'package:http/http.dart';
 
 import 'package:movie_app/config/movie_section.dart';
@@ -40,7 +40,7 @@ void main() {
         });
 
         PageOf<MovieBase> movies = await movieDbProvider.getMovies(sectionUrl, 1);
-        expect(movies, const TypeMatcher<PageOf<MovieBase>>());
+        expect(movies, isInstanceOf<PageOf<MovieBase>>());
         expect(movies.items.length >= 2, true);//check if results parsed correctly
       });
       test('getMovies(${section.toStr}) - HttpCode(404)', () async {
@@ -67,7 +67,7 @@ void main() {
       });
 
       var videos = await movieDbProvider.getVideos(movieId);
-      expect(videos, const TypeMatcher<List<Video>>());
+      expect(videos, isInstanceOf<List<Video>>());
     });
     test('getVideos($movieId) - HttpCode(404)', () async {
       when(client.get(getVideosUrl))
@@ -93,7 +93,7 @@ void main() {
       });
 
       var casts = await movieDbProvider.getCasts(movieId);
-      expect(casts, const TypeMatcher<List<Cast>>());
+      expect(casts, isInstanceOf<List<Cast>>());
     });
     test('getCasts($movieId) - HttpCode(404)', () async {
       when(client.get(getCastsUrl))
@@ -119,7 +119,7 @@ void main() {
       });
 
       var reviews = await movieDbProvider.getReviews(movieId, 1);
-      expect(reviews, const TypeMatcher<PageOf<Review>>());
+      expect(reviews, isInstanceOf<PageOf<Review>>());
     });
     test('getReviews($movieId) - HttpCode(404)', () async {
       when(client.get(getReviewUrl))

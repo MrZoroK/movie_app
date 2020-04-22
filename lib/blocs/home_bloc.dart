@@ -14,16 +14,16 @@ class HomeBloc extends BlocBase {
   var _genresPublisher = PublishSubject<PageOf<Genre>>();
   Stream<PageOf<Genre>> get genres => _genresPublisher.stream;
 
-  void loadMovies(MovieSection section, int page) {
-    repository.getMovies(section, page: page).then((value){
+  void loadMovies(MovieSection section, int page, bool cache) {
+    repository.getMovies(section, page: page, cache: cache).then((value){
       if (!_pageOfMoviesPublishers[section.index].isClosed) {
         _pageOfMoviesPublishers[section.index].sink.add(value);
       }
     });
   }
 
-  void loadGenres() {
-    repository.getGenres().then((value){
+  void loadGenres(bool cache) {
+    repository.getGenres(cache: cache).then((value){
       if (!_genresPublisher.isClosed) {
         _genresPublisher.sink.add(PageOf.fromList(value));
       }

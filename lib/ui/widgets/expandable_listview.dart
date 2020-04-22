@@ -7,7 +7,7 @@ import 'package:shimmer/shimmer.dart';
 
 import 'package:movie_app/models.dart';
 
-typedef LoadMoreCallback = void Function(int nextPage);
+typedef LoadMoreCallback = void Function(int nextPage, bool fromCache);
 typedef ItemBuilder<T> = Widget Function(BuildContext context, T item);
 
 class ExpandableListView<T> extends StatefulWidget {
@@ -39,36 +39,27 @@ class _ExpandableListViewState<T> extends State<ExpandableListView> with Automat
   PageOf<T> _expandableList;
   ScrollController _scrollCtrler;
   StreamController<bool> _streamCtrler = StreamController.broadcast();
-
-
-
-  // _scrollListener() {
-  //   if (_scrollCtrler.offset >= _scrollCtrler.position.maxScrollExtent &&
-  //       !_scrollCtrler.position.outOfRange) {
-  //     _loadMore();
-  //   }
-  // }
-
+  bool loadFromCache = true;
   bool get canLoadMore => _expandableList != null && _expandableList.page < _expandableList.totalPages;
 
   void _refresh() async {
     await Future.delayed(Duration(seconds: 1));
     _expandableList = null;
-    widget.onLoadMore(1);
+    loadFromCache = false;
+    widget.onLoadMore(1, loadFromCache);
   }
   void _loadMore() {
     if (canLoadMore) {
-      widget.onLoadMore(_expandableList.page + 1);
+      widget.onLoadMore(_expandableList.page + 1, loadFromCache);
     }
   }
 
   @override void initState() {
     super.initState();
     _scrollCtrler = ScrollController();
-    //_scrollCtrler.addListener(_scrollListener);
     if (widget.onLoadMore != null) {
       //the first time of load
-      widget.onLoadMore(1);
+      widget.onLoadMore(1, loadFromCache);
     }
   }
 

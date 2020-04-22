@@ -106,8 +106,8 @@ class _HomeScreenState extends State<HomeScreen> {
         itemBuilder: (context, item){
           return _buildMovieCard(item);
         },
-        onLoadMore: (nextPage){
-          _bloc.loadMovies(section, nextPage);
+        onLoadMore: (nextPage, cache){
+          _bloc.loadMovies(section, nextPage, cache);
         },
         height: _movieSecionHeight,
       ),
@@ -196,8 +196,8 @@ class _HomeScreenState extends State<HomeScreen> {
         itemBuilder: (context, item){
           return _buildTrendingMovieCard(item);
         },
-        onLoadMore: (nextPage){
-          _bloc.loadMovies(section, nextPage);
+        onLoadMore: (nextPage, fromCache){
+          _bloc.loadMovies(section, nextPage, fromCache);
         },
         height: _trendingSecionHeight,
         dummySize: 2,
@@ -238,8 +238,8 @@ class _HomeScreenState extends State<HomeScreen> {
         itemBuilder: (context, item){
           return _buildCategoryCard(item);
         },
-        onLoadMore: (_){
-          _bloc.loadGenres();
+        onLoadMore: (_, cache){
+          _bloc.loadGenres(cache);
         },
         height: 80 * widthRatio,
         dummySize: 2,

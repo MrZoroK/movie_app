@@ -28,24 +28,24 @@ class MovieDetailBloc extends BlocBase {
   var _genresPublisher = PublishSubject<List<String>>();
   Stream<List<String>> get genres => _genresPublisher.stream;
 
-  void loadCasts() {
-    repository.getCasts(movie.id).then((value){
+  void loadCasts(bool cache) {
+    repository.getCasts(movie.id, cache: cache).then((value){
       if (!_castsPublisher.isClosed) {
         _castsPublisher.sink.add(PageOf.fromList(value));
       }
     });
   }
 
-  void loadVideos() {
-    repository.getVideos(movie.id).then((value){
+  void loadVideos(bool cache) {
+    repository.getVideos(movie.id, cache: cache).then((value){
       if (!_videosPublisher.isClosed) {
         _videosPublisher.sink.add(PageOf.fromList(value));
       }
     });
   }
 
-  Future<String> loadVideoUrl(String videoId) {
-    return repository.getVideoDetails(videoId).then((videoDetails){
+  Future<String> loadVideoUrl(String videoId, bool cache) {
+    return repository.getVideoDetails(videoId, cache: cache).then((videoDetails){
       if (videoDetails != null && videoDetails.length > 0) {
         return videoDetails[0].url;
       }
@@ -53,16 +53,16 @@ class MovieDetailBloc extends BlocBase {
     });
   }
 
-  void loadRecommendedMovies(int page) {
-    repository.getRecommendedMovies(movie.id, page).then((value){
+  void loadRecommendedMovies(int page, bool cache) {
+    repository.getRecommendedMovies(movie.id, page, cache: cache).then((value){
       if (!_recommendationsPublisher.isClosed) {
         _recommendationsPublisher.sink.add(value);
       }
     });
   }
 
-  void _internalLoadReviews(int page) {
-    repository.getReviews(movie.id, page).then((value){
+  void _internalLoadReviews(int page, bool cache) {
+    repository.getReviews(movie.id, page, cache: cache).then((value){
       value.items.forEach((review) {
         _listReviewDetails.forEach((detail) {
           if (review.id == detail.id) {
@@ -75,18 +75,18 @@ class MovieDetailBloc extends BlocBase {
       }
     });
   }
-  void loadReviews(int page) {
+  void loadReviews(int page, bool cache) {
     if (_listReviewDetails.length > 0) {
-      _internalLoadReviews(page);
+      _internalLoadReviews(page, cache);
     } else {
-      repository.getReviewsDetail(movie).then((value){
+      repository.getReviewsDetail(movie, cache: cache).then((value){
          _listReviewDetails = value;
-        _internalLoadReviews(page);
+        _internalLoadReviews(page, cache);
       });
     }
   }
-  void loadGenres() {
-    repository.getGenres().then((allGenres){
+  void loadGenres(bool cache) {
+    repository.getGenres(cache: cache).then((allGenres){
       List<String> movieGenres = List();
       allGenres.forEach((genre) {
         movie.genreIds.forEach((genreId) {

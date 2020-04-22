@@ -12,16 +12,16 @@ import 'resources/movie_repository.dart';
 
 void setupDI() {
   GetIt.I.registerSingleton(Client());
+  GetIt.I.registerSingleton(NetworkCacheProvider());
   GetIt.I.registerSingleton(MovieDbProvider(
     apiKey: API_KEY,
     baseUrl: API_BASE_URL,
     language: "en-US",
-    client: GetIt.I.get()
+    client: GetIt.I.get(),
+    networkCache: GetIt.I.get(),
   ));
-  GetIt.I.registerSingleton(MySQLProvider());
   GetIt.I.registerSingleton(MovieRepository(
-    movieDbProvider: GetIt.I.get(),
-    mySQLProvider: GetIt.I.get()
+    movieDbProvider: GetIt.I.get()
   ));
 }
 void main() {
@@ -51,10 +51,6 @@ class MyApp extends StatelessWidget {
         // Notice that the counter didn't reset back to zero; the application
         // is not restarted.
         primarySwatch: Colors.blue,
-        // This makes the visual density adapt to the platform that you run
-        // the app on. For desktop platforms, the controls will be smaller and
-        // closer together (more dense) than on mobile platforms.
-        visualDensity: VisualDensity.adaptivePlatformDensity,
         fontFamily: 'Helvetica',
         backgroundColor: const Color(0xFFF8F8F8)
       ),

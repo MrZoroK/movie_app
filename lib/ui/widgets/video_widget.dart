@@ -55,7 +55,7 @@ class _VideoWidgetState extends State<VideoWidget> {
       create: (_) {
         var readyState = ReadyPlayState();
         readyState.val = VideoState.LOADING;
-        _bloc.loadVideoUrl(widget.video.key).then((url){
+        _bloc.loadVideoUrl(widget.video.key, true).then((url){
           if (url != null && url !=  "")  {
             _controller = VideoPlayerController.network(url)
             ..initialize().then((_) {

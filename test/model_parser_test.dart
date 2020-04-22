@@ -1,9 +1,9 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:flutter_test/flutter_test.dart';
 import 'package:movie_app/config/movie_section.dart';
 import 'package:movie_app/models.dart';
-import 'package:test/test.dart';
 
 void main() {
   int movieId = 419704;
