@@ -153,12 +153,12 @@ class MovieDbProvider {
           return networkCache.get(url);
         } else {
           if (resp.statusCode == 200) {
-            await networkCache.put(url, resp);
+            await networkCache?.put(url, resp);
           }
           return resp;
         }
       }).catchError((err){
-        return networkCache.get(url);
+        return networkCache?.get(url);
       });
     } else {
       if (networkCache != null) {

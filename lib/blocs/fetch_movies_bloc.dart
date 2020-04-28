@@ -3,6 +3,7 @@ import 'package:get_it/get_it.dart';
 import 'package:movie_app/blocs/events/fetch_recommedations.dart';
 import 'package:movie_app/resources/movie_repository.dart';
 
+import '../models.dart';
 import 'events/fetch_movies.dart';
 import 'events/fetch_page.dart';
 import 'fetch_page_bloc.dart';
@@ -31,7 +32,7 @@ class FetchMoviesBloc extends FetchPageBloc {
   Stream<FetchPageState> _mapFetchMoviesEventToState(FetchMoviesEvent event) async* {
     yield FetchPageStateLoading();
     try {
-      final page = await (event is FetchRecommendationEvent
+      Page<MovieBase> page = await (event is FetchRecommendationEvent
       ? repository.getRecommendedMovies(event.movieId, event.page, cache: event.cache)
       : repository.getMovies(event.movieSection, page: event.page, cache: event.cache));
 
