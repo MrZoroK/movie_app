@@ -3,7 +3,7 @@ import '../models.dart';
 part 'page.g.dart';
 
 @JsonSerializable(explicitToJson: true)
-class PageOf<T> {
+class Page<T> {
   @_Converter()
   @JsonKey(name: "results")
   List<T> items;
@@ -20,24 +20,24 @@ class PageOf<T> {
     return false;
   }
 
-  factory PageOf.fromJson(Map<String, dynamic> json) => _$PageOfFromJson(json);
-  factory PageOf.fromList(List<T> list) {
-     return PageOf<T>(
+  factory Page.fromJson(Map<String, dynamic> json) => _$PageFromJson(json);
+  factory Page.fromList(List<T> list) {
+     return Page<T>(
       page: 1,
       totalPages: 1,
       totalResults: list.length,
       items: list,
     );
   }
-  Map<String, dynamic> toJson() => _$PageOfToJson(this);  
-  PageOf(
+  Map<String, dynamic> toJson() => _$PageToJson(this);  
+  Page(
     {
     this.page,
     this.totalPages,
     this.totalResults,
     this.items});
 
-  void append(PageOf<T> nextPage) {
+  void append(Page<T> nextPage) {
     if (this.page < nextPage.page) {
       //remove duplicate or null item
       this.items.removeWhere((toRemove){

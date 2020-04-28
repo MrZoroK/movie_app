@@ -39,8 +39,8 @@ void main() {
           return Response(response, 200, headers: headers);
         });
 
-        PageOf<MovieBase> movies = await movieDbProvider.getMovies(sectionUrl, 1);
-        expect(movies, isInstanceOf<PageOf<MovieBase>>());
+        Page<MovieBase> movies = await movieDbProvider.getMovies(sectionUrl, 1);
+        expect(movies, isInstanceOf<Page<MovieBase>>());
         expect(movies.items.length >= 2, true);//check if results parsed correctly
       });
       test('getMovies(${section.toStr}) - HttpCode(404)', () async {
@@ -119,7 +119,7 @@ void main() {
       });
 
       var reviews = await movieDbProvider.getReviews(movieId, 1);
-      expect(reviews, isInstanceOf<PageOf<Review>>());
+      expect(reviews, isInstanceOf<Page<Review>>());
     });
     test('getReviews($movieId) - HttpCode(404)', () async {
       when(client.get(getReviewUrl))

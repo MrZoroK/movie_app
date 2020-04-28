@@ -1,18 +1,19 @@
 import 'dart:async';
 import 'dart:math';
 import 'dart:ui';
+
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:movie_app/blocs/events/fetch_page.dart';
+import 'package:movie_app/blocs/fetch_page_bloc.dart';
+import 'package:movie_app/blocs/states/fetch_page.dart';
+import 'package:movie_app/models/page.dart';
 import 'package:shimmer/shimmer.dart';
 
-import 'package:movie_app/models.dart';
-
-typedef LoadMoreCallback = void Function(int nextPage, bool fromCache);
 typedef ItemBuilder<T> = Widget Function(BuildContext context, T item);
 
-class ExpandableListView<T> extends StatefulWidget {
-  final Stream<Page<T>> stream;
-  final LoadMoreCallback onLoadMore;
+class ExpandablePageView<T> extends StatefulWidget {
+  final FetchPageEvent fetchMoreEvent;
   final ItemBuilder itemBuilder;
   final double height;
   final int dummySize;
@@ -20,10 +21,9 @@ class ExpandableListView<T> extends StatefulWidget {
   final double verticalItemHeight;
   final bool pullToRefresh;
 
-  ExpandableListView({
-    @required this.stream,
+  ExpandablePageView({
     @required this.itemBuilder,
-    @required this.onLoadMore,
+    @required this.fetchMoreEvent,
     @required this.height,
     this.dummySize = 3,
     this.scrollDirection = Axis.horizontal,
@@ -32,37 +32,43 @@ class ExpandableListView<T> extends StatefulWidget {
   });
 
   @override
-  _ExpandableListViewState createState() => _ExpandableListViewState<T>();
+  _ExpandablePageViewState createState() => _ExpandablePageViewState();
 }
 
-class _ExpandableListViewState<T> extends State<ExpandableListView> with AutomaticKeepAliveClientMixin  {
+class _ExpandablePageViewState<T> extends State<ExpandablePageView> with AutomaticKeepAliveClientMixin {
   Page<T> _expandableList;
   ScrollController _scrollCtrler;
   StreamController<bool> _streamCtrler = StreamController.broadcast();
   bool loadFromCache = true;
-  bool get canLoadMore => _expandableList != null && _expandableList.page < _expandableList.totalPages;
+  bool get canExpand => _expandableList != null && _expandableList.page < _expandableList.totalPages;
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollCtrler = ScrollController();
+    if (widget.fetchMoreEvent != null) {
+      //the first time of load
+      loadFromCache = widget.fetchMoreEvent.cache;
+    }
+  }
+
+  FetchPageEvent _createFetchPageEvent(int page) {
+    var fetchMoreEvent = widget.fetchMoreEvent;
+    fetchMoreEvent.page = page;
+    fetchMoreEvent.cache = loadFromCache;
+    return fetchMoreEvent;
+  }
 
   void _refresh() async {
     await Future.delayed(Duration(seconds: 1));
-    _expandableList = null;
     loadFromCache = false;
-    widget.onLoadMore(1, loadFromCache);
-  }
-  void _loadMore() {
-    if (canLoadMore) {
-      widget.onLoadMore(_expandableList.page + 1, loadFromCache);
-    }
+    _loadPage(1);
   }
 
-  @override void initState() {
-    super.initState();
-    _scrollCtrler = ScrollController();
-    if (widget.onLoadMore != null) {
-      //the first time of load
-      widget.onLoadMore(1, loadFromCache);
-    }
+  void _loadPage(int page) {
+    BlocProvider.of<FetchPageBloc>(context).add(_createFetchPageEvent(page));
   }
-
+  
   @override
   Widget build(BuildContext context) {
     super.build(context);//this needed for wantKeepAlive
@@ -70,23 +76,31 @@ class _ExpandableListViewState<T> extends State<ExpandableListView> with Automat
     return Container(
       child: Stack(
         children: [
-          StreamBuilder(
-            stream: widget.stream,
-            builder: (context, snapshot){
-              if (!snapshot.hasData) {
-                return _dummyList();
-              } else {
-                return _updateList(snapshot.data);
+          BlocBuilder<FetchPageBloc, FetchPageState>(builder: (context, state){
+            if (state is FetchPageStateNone) {
+              _loadPage(1);
+              return Container();
+            } else if (state is FetchPageStateSuccess) {
+              _extendPage(state.page);
+              return _buildPage(state);
+            } else {
+              if (state is FetchPageStateError ) {
+                //TODO: show error popup
               }
-            },
-          ),
+              if (_expandableList == null) {
+                return _buildDummyPage();
+              } else {
+                return _buildPage(state);
+              }
+            }
+          }),
           widget.pullToRefresh ? _refreshIndicator() : Container()
         ],
       ),
     );
   }
 
-  Widget _dummyList() {
+  Widget _buildDummyPage() {
     List<T> dummy = List.generate(widget.dummySize, (index) => null);
     double veticalHeight = min(widget.height, widget.dummySize * widget.verticalItemHeight);
 
@@ -112,58 +126,79 @@ class _ExpandableListViewState<T> extends State<ExpandableListView> with Automat
     double veticalHeight = min(widget.height, itemCount * widget.verticalItemHeight);
     return widget.scrollDirection == Axis.horizontal ? widget.height : veticalHeight;
   }
-  Widget _updateList(Page<T> newData) {
+
+  void _extendPage(Page<T> newData) {
     if (_expandableList == null) {
       _expandableList = newData;
     } else {
       _expandableList.append(newData);
     }
-    if (canLoadMore) {
-      _expandableList.items.add(null);//dummy at last
+    if (canExpand) {
+      _expandableList.items.add(null);
+      //dummy at last for loadmore button or loading icon
     }
+  }
+
+  _onPullListener(event) async {
+    if (!widget.pullToRefresh) {
+      return;
+    }
+    if (widget.scrollDirection == Axis.horizontal) {
+      if (event.delta.dx > 10.0 && _scrollCtrler.position.pixels == _scrollCtrler.position.minScrollExtent) {
+        _streamCtrler.add(true);
+      }
+    } else {
+      if (event.delta.dy > 10.0 && _scrollCtrler.position.pixels == _scrollCtrler.position.minScrollExtent) {
+        _streamCtrler.add(true);
+      }
+    }
+  }
+
+  Widget _buildLoadMoreButton() {
+    return Center(
+      child: FlatButton(
+        child: Container(
+          width: 100,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              Icon(
+                Icons.play_arrow, color: Color(0xFF00CBCF), size: 50
+              ),
+              Text("Load more"),
+            ],
+          ),
+        ),
+        onPressed: (){
+          _loadPage(_expandableList.page + 1);
+        },
+      ),
+    );
+  }
+
+  Widget _buildPage(FetchPageState state) {
     int itemCount = _expandableList.items.length;
 
     _streamCtrler.add(false);
     return Container(
       height: calcHeight(itemCount),
       child: Listener(
-        onPointerMove: (event) async {
-          if (!widget.pullToRefresh) {
-            return;
-          }
-          if (widget.scrollDirection == Axis.horizontal) {
-            if (event.delta.dx > 10.0 && _scrollCtrler.position.pixels == _scrollCtrler.position.minScrollExtent) {
-              _streamCtrler.add(true);
-            }
-          } else {
-            if (event.delta.dy > 10.0 && _scrollCtrler.position.pixels == _scrollCtrler.position.minScrollExtent) {
-              _streamCtrler.add(true);
-            }
-          }
-        },
+        onPointerMove: _onPullListener,
         child: ListView.builder(
           itemCount: itemCount,
           scrollDirection: widget.scrollDirection,
           controller: _scrollCtrler,
-          itemBuilder: (context, index){
+          itemBuilder: (ctx, index){
             if (index == itemCount - 1 && _expandableList.items[index] == null) {
-              return Center(
-                child: FlatButton(
-                  child: Container(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      mainAxisSize: MainAxisSize.min,
-                      children: <Widget>[
-                        Icon(
-                          Icons.play_arrow, color: Color(0xFF00CBCF), size: 50
-                        ),
-                        Text("Load more"),
-                      ],
-                    ),
-                  ),
-                  onPressed: _loadMore,
-                ),
-              );
+              if (state is FetchPageStateLoading) {
+                return Container(
+                  width: 100,
+                  child: Center(child: CircularProgressIndicator())
+                );
+              } else {
+                return _buildLoadMoreButton();
+              }
             } else {
               return widget.itemBuilder(context, _expandableList.items[index]);
             }
@@ -197,12 +232,6 @@ class _ExpandableListViewState<T> extends State<ExpandableListView> with Automat
         return Container();
       },
     );
-  }
-
-  @override
-  void dispose() {
-    _streamCtrler.close();
-    super.dispose();
   }
 
   @override

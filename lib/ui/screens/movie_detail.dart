@@ -1,8 +1,11 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
+
 import 'package:movie_app/config/constant.dart';
 import 'package:movie_app/ui/screens/movie_detail_component/comment_item.dart';
+import 'package:movie_app/ui/widgets/expandable_pageview.dart';
 import 'package:movie_app/ui/widgets/video_widget.dart';
 
 import 'package:movie_app/uis.dart';
@@ -64,7 +67,7 @@ class _MovieDetailScreenState extends State<MovieDetailScreen> {
   @override
   Widget build(BuildContext context) {
     if (_bloc == null) {
-      _bloc = BlocProvider.of(context);
+      _bloc = MyBlocProvider.of(context);
     }
 
     return Scaffold(
@@ -507,17 +510,21 @@ class _MovieDetailScreenState extends State<MovieDetailScreen> {
       onPressed: () {
         //Todo: Comment section arrow
       },
-      list: ExpandableListView(
-        stream: _bloc.reviews,
-        itemBuilder: (context, item){
-          return CommentItem(item);
+      list: BlocProvider<FetchPageBloc>(
+        create: (context){
+          return FetchReviewsBloc(_bloc.movie);
         },
-        verticalItemHeight: 140,
-        scrollDirection: Axis.vertical,
-        pullToRefresh: false,
-        onLoadMore: (page, fromCache) => _bloc.loadReviews(page, fromCache),
-        dummySize: 1,
-        height: 450
+        child: ExpandablePageView(
+          itemBuilder: (context, item){
+            return CommentItem(item);
+          },
+          fetchMoreEvent: FetchReviewsEvent(true),
+          verticalItemHeight: 140,
+          scrollDirection: Axis.vertical,
+          pullToRefresh: false,
+          dummySize: 1,
+          height: 450
+        )
       ),
     );
   }
@@ -526,7 +533,7 @@ class _MovieDetailScreenState extends State<MovieDetailScreen> {
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(
-        builder: (context) => BlocProvider<MovieDetailBloc>(
+        builder: (context) => MyBlocProvider<MovieDetailBloc>(
           builder: (_, bloc) {
             return bloc ?? MovieDetailBloc(moviebase);
           },
@@ -542,19 +549,25 @@ class _MovieDetailScreenState extends State<MovieDetailScreen> {
       onPressed: () {
         //TODO: Recommendations arrow
       },
-      list: ExpandableListView(
-        stream: _bloc.recommendation,
-        itemBuilder: (context, item){
-          return InkWell(
-            child: _buildRecommendationCard(item),
-            onTap: () => _gotoMovieDetailScreen(item),
-          );
+      list: BlocProvider<FetchPageBloc>(
+        create: (context){
+          return FetchMoviesBloc();
         },
-        onLoadMore: (nextPage, fromCache){
-          _bloc.loadRecommendedMovies(nextPage, fromCache);
-        },
-        dummySize: 3,
-        height: 230,
+        child: ExpandablePageView(
+          itemBuilder: (context, item){
+            return InkWell(
+              child: _buildRecommendationCard(item),
+              onTap: (){
+                if (item != null) {
+                  _gotoMovieDetailScreen(item);
+                }
+              }
+            );
+          },
+          fetchMoreEvent: FetchRecommendationEvent(_bloc.movie.id, true),
+          dummySize: 3,
+          height: 230,
+        )
       ),
     );
   }

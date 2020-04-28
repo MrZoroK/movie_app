@@ -1,3 +1,10 @@
 export 'blocs/bloc_provider.dart';
-export 'blocs/home_bloc.dart';
+export 'blocs/events/fetch_genres.dart';
+export 'blocs/events/fetch_movies.dart';
+export 'blocs/events/fetch_reviews.dart';
+export 'blocs/events/fetch_recommedations.dart';
+export 'blocs/fetch_page_bloc.dart';
+export 'blocs/fetch_movies_bloc.dart';
+export 'blocs/fetch_genres_bloc.dart';
+export 'blocs/fetch_reviews_bloc.dart';
 export 'blocs/movie_detail_bloc.dart';

@@ -13,17 +13,17 @@ class MovieDetailBloc extends BlocBase {
 
   final MovieRepository repository = GetIt.I.get();
 
-  var _castsPublisher = PublishSubject<PageOf<Cast>>();
-  Stream<PageOf<Cast>> get casts => _castsPublisher.stream;
+  var _castsPublisher = PublishSubject<Page<Cast>>();
+  Stream<Page<Cast>> get casts => _castsPublisher.stream;
 
-  var _recommendationsPublisher = PublishSubject<PageOf<MovieBase>>();
-  Stream<PageOf<MovieBase>> get recommendation => _recommendationsPublisher.stream;
+  var _recommendationsPublisher = PublishSubject<Page<MovieBase>>();
+  Stream<Page<MovieBase>> get recommendation => _recommendationsPublisher.stream;
 
-  var _videosPublisher = PublishSubject<PageOf<Video>>();
-  Stream<PageOf<Video>> get videos => _videosPublisher.stream;
+  var _videosPublisher = PublishSubject<Page<Video>>();
+  Stream<Page<Video>> get videos => _videosPublisher.stream;
 
-  var _reviewsPublisher = PublishSubject<PageOf<Review>>();
-  Stream<PageOf<Review>> get reviews => _reviewsPublisher.stream;
+  var _reviewsPublisher = PublishSubject<Page<Review>>();
+  Stream<Page<Review>> get reviews => _reviewsPublisher.stream;
 
   var _genresPublisher = PublishSubject<List<String>>();
   Stream<List<String>> get genres => _genresPublisher.stream;
@@ -31,7 +31,7 @@ class MovieDetailBloc extends BlocBase {
   void loadCasts(bool cache) {
     repository.getCasts(movie.id, cache: cache).then((value){
       if (!_castsPublisher.isClosed) {
-        _castsPublisher.sink.add(PageOf.fromList(value));
+        _castsPublisher.sink.add(Page.fromList(value));
       }
     });
   }
@@ -39,7 +39,7 @@ class MovieDetailBloc extends BlocBase {
   void loadVideos(bool cache) {
     repository.getVideos(movie.id, cache: cache).then((value){
       if (!_videosPublisher.isClosed) {
-        _videosPublisher.sink.add(PageOf.fromList(value));
+        _videosPublisher.sink.add(Page.fromList(value));
       }
     });
   }
@@ -87,18 +87,20 @@ class MovieDetailBloc extends BlocBase {
   }
   void loadGenres(bool cache) {
     repository.getGenres(cache: cache).then((allGenres){
-      List<String> movieGenres = List();
-      allGenres.forEach((genre) {
-        movie.genreIds.forEach((genreId) {
-          if (genre.id == genreId) {
-            movieGenres.add(genre.name);
-          }
+      if (allGenres != null) {
+        List<String> movieGenres = List();
+        allGenres.forEach((genre) {
+          movie.genreIds.forEach((genreId) {
+            if (genre.id == genreId) {
+              movieGenres.add(genre.name);
+            }
+          });
         });
-      });
-      movieGenres.sort((a, b) => a.length.compareTo(b.length));
-      
-      if (!_genresPublisher.isClosed) {
-        _genresPublisher.sink.add(movieGenres);
+        movieGenres.sort((a, b) => a.length.compareTo(b.length));
+        
+        if (!_genresPublisher.isClosed) {
+          _genresPublisher.sink.add(movieGenres);
+        }
       }
     });
   }

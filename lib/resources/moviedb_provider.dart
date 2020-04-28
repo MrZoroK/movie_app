@@ -25,12 +25,12 @@ class MovieDbProvider {
     return url;
   }
 
-  static PageOf<MovieBase> _parseMoviePage(Uint8List responseBody) {
+  static Page<MovieBase> _parseMoviePage(Uint8List responseBody) {
     try {
       var utf8String = utf8.decode(responseBody);
       var jsObj = json.decode(utf8String);
       if (jsObj != null) {
-        return PageOf<MovieBase>.fromJson(jsObj);
+        return Page<MovieBase>.fromJson(jsObj);
       }
     } catch (e) {
       developer.log('decode HttpResponse to Json failed', name: '_responseToJson', error: e);
@@ -73,12 +73,12 @@ class MovieDbProvider {
     }
     return null;
   }
-  static PageOf<Review> _parseReviews(Uint8List responseBody) {
+  static Page<Review> _parseReviews(Uint8List responseBody) {
     try {
       var utf8String = utf8.decode(responseBody);
       var jsObj = json.decode(utf8String);
       if (jsObj != null) {
-        return PageOf<Review>.fromJson(jsObj);
+        return Page<Review>.fromJson(jsObj);
       }
     } catch (e) {
       developer.log('decode HttpResponse to Json failed', name: '_responseToJson', error: e);
@@ -169,7 +169,7 @@ class MovieDbProvider {
     }
   }
 
-  Future<PageOf<MovieBase>> getMovies(String path, int page, {bool useCache = true}) {
+  Future<Page<MovieBase>> getMovies(String path, int page, {bool useCache = true}) {
     String url = buildRequestUrl(path, params: { "page": page} );
     return _fetchUrl(url, cache: useCache).then((resp){
       if (resp != null && resp.statusCode == 200) {
@@ -217,7 +217,7 @@ class MovieDbProvider {
     });
   }
 
-  Future<PageOf<Review>> getReviews(int movieId, int page, {bool useCache = true}) {
+  Future<Page<Review>> getReviews(int movieId, int page, {bool useCache = true}) {
     String url = buildRequestUrl("/movie/$movieId/reviews",
                                   params: {
                                     "page": page

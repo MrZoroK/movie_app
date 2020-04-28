@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:movie_app/config/constant.dart';
 
+import 'package:movie_app/config/constant.dart';
 import 'package:movie_app/config/movie_section.dart';
-import 'package:movie_app/blocs.dart';
 import 'package:movie_app/models.dart';
+import 'package:movie_app/ui/widgets/expandable_pageview.dart';
 import 'package:movie_app/uis.dart';
 import 'package:movie_app/utils.dart';
+import 'package:movie_app/blocs.dart';
 
 class MovieCardConfig {
   static const SIZE = const Size(140, 210);
@@ -27,7 +29,6 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  HomeBloc _bloc;
   static const SECTION_PADDING = 20.0;
 
   double _widthRatio;
@@ -42,7 +43,7 @@ class _HomeScreenState extends State<HomeScreen> {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => BlocProvider<MovieDetailBloc>(
+        builder: (context) => MyBlocProvider<MovieDetailBloc>(
           builder: (_, bloc) {
             return bloc ?? MovieDetailBloc(moviebase);
           },
@@ -52,11 +53,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
   @override
-  Widget build(BuildContext context) {
-    if (_bloc == null) {
-      _bloc = BlocProvider.of(context);
-    }
-    
+  Widget build(BuildContext context) {   
     return Scaffold(
       appBar: _topbar(context),
       body: _buildSections(),
@@ -101,18 +98,20 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget _buildMovieSection(MovieSection section) {
     return SectionWidget(
       text: section.toText.toUpperCase(), sectionStyle: SectionStyle.HOME,
-      list: ExpandableListView(
-        stream: _bloc.movies(section),
-        itemBuilder: (context, item){
-          return _buildMovieCard(item);
+      list: BlocProvider<FetchPageBloc>(
+        create: (context){
+          return FetchMoviesBloc();
         },
-        onLoadMore: (nextPage, cache){
-          _bloc.loadMovies(section, nextPage, cache);
-        },
-        height: _movieSecionHeight,
+        child: ExpandablePageView(
+          itemBuilder: (context, item){
+            return _buildMovieCard(item);
+          },
+          fetchMoreEvent: FetchMoviesEvent(section, true),
+          height: _movieSecionHeight,
+        )
       ),
       onPressed: () {
-
+        //TODO: goto detail of movies section
       },
     );
   }
@@ -173,7 +172,11 @@ class _HomeScreenState extends State<HomeScreen> {
                 shadowRect: cardShadowRect,
                 shadowBorderRadius: 5.3, shadowBlurRadius: 24,
               ),
-              onTap: () => _gotoMovieDetailScreen(movie),
+              onTap: (){
+                if (movie != null) {
+                  _gotoMovieDetailScreen(movie);
+                }
+              }
             ),
           ),
           title
@@ -191,19 +194,21 @@ class _HomeScreenState extends State<HomeScreen> {
     return SectionWidget(
       text: section.toText.toUpperCase(),
       sectionStyle: SectionStyle.TRENDING,
-      list: ExpandableListView(
-        stream: _bloc.movies(section),
-        itemBuilder: (context, item){
-          return _buildTrendingMovieCard(item);
+      list: BlocProvider<FetchPageBloc>(
+        create: (context){
+          return FetchMoviesBloc();
         },
-        onLoadMore: (nextPage, fromCache){
-          _bloc.loadMovies(section, nextPage, fromCache);
-        },
-        height: _trendingSecionHeight,
-        dummySize: 2,
+        child: ExpandablePageView(
+          itemBuilder: (context, item){
+            return _buildTrendingMovieCard(item);
+          },
+          fetchMoreEvent: FetchMoviesEvent(section, true),
+          height: _trendingSecionHeight,
+          dummySize: 2,
+        )
       ),
       onPressed: () {
-
+        //TODO: goto detail of trending section
       },
     );
   }
@@ -224,7 +229,11 @@ class _HomeScreenState extends State<HomeScreen> {
           shadowRect: TrendingCardConfig.SHADOW_RECT * widthRatio,
           shadowBorderRadius: 5.4, shadowBlurRadius: 24.5,
         ),
-        onTap: () => _gotoMovieDetailScreen(movie),
+        onTap: (){
+          if (movie != null) {
+            _gotoMovieDetailScreen(movie);
+          }
+        }
       ),
     );
   }
@@ -233,20 +242,22 @@ class _HomeScreenState extends State<HomeScreen> {
     return SectionWidget(
       text: "CATEGORY",
       sectionStyle: SectionStyle.TRENDING,
-      list: ExpandableListView(
-        stream: _bloc.genres,
-        itemBuilder: (context, item){
-          return _buildCategoryCard(item);
+      list: BlocProvider<FetchPageBloc>(
+        create: (context){
+          return FetchGenresBloc();
         },
-        onLoadMore: (_, cache){
-          _bloc.loadGenres(cache);
-        },
-        height: 80 * widthRatio,
-        dummySize: 2,
+        child: ExpandablePageView(
+          itemBuilder: (context, item){
+            return _buildCategoryCard(item);
+          },
+          fetchMoreEvent: FetchGenresEvent(true),
+          height: 80 * widthRatio,
+          dummySize: 2,
+        )
       ),
       onPressed: () {
-
-      },
+        //TODO: goto detail of category section
+      }
     );
   }
 

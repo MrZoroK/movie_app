@@ -48,7 +48,7 @@ class _VideoWidgetState extends State<VideoWidget> {
   @override
   Widget build(BuildContext context) {
     if (_bloc == null) {
-      _bloc = BlocProvider.of(context);
+      _bloc = MyBlocProvider.of(context);
     }
 
     return ChangeNotifierProvider(

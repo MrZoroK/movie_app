@@ -20,11 +20,11 @@ class _InternalProvider<T extends BlocBase> extends InheritedWidget {
   }
 }
 
-class BlocProvider<T extends BlocBase> extends StatefulWidget {
+class MyBlocProvider<T extends BlocBase> extends StatefulWidget {
   final Widget child;
   final T Function(BuildContext context, T bloc) builder;
 
-  BlocProvider({
+  MyBlocProvider({
     Key key,
     @required this.builder,
     @required this.child,
@@ -39,7 +39,7 @@ class BlocProvider<T extends BlocBase> extends StatefulWidget {
   }
 }
 
-class _BlocProviderState<T extends BlocBase> extends State<BlocProvider<T>> {
+class _BlocProviderState<T extends BlocBase> extends State<MyBlocProvider<T>> {
   T bloc;
 
   @override

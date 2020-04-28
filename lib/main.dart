@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get_it/get_it.dart';
 import 'package:http/http.dart';
-import 'package:movie_app/blocs/bloc_provider.dart';
-import 'package:movie_app/blocs/home_bloc.dart';
 import 'package:movie_app/ui/screens/home.dart';
 
 import 'config/constant.dart';
@@ -54,9 +52,7 @@ class MyApp extends StatelessWidget {
         fontFamily: 'Helvetica',
         backgroundColor: const Color(0xFFF8F8F8)
       ),
-      home: BlocProvider<HomeBloc>(builder: (_, bloc){
-        return bloc ?? HomeBloc();
-      }, child: HomeScreen()),
+      home: HomeScreen(),
     );
   }
 }

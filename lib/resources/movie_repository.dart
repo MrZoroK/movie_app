@@ -6,11 +6,11 @@ class MovieRepository {
   final MovieDbProvider movieDbProvider;
   MovieRepository({this.movieDbProvider});
 
-  Future<PageOf<MovieBase>> getMovies(MovieSection movieSection, {int page = 1, bool cache = true}) {
+  Future<Page<MovieBase>> getMovies(MovieSection movieSection, {int page = 1, bool cache = true}) {
     return movieDbProvider.getMovies(movieSection.url(), page, useCache: cache);
   }
 
-  Future<PageOf<MovieBase>> getRecommendedMovies(int movieId, int page, {bool cache = true}) {
+  Future<Page<MovieBase>> getRecommendedMovies(int movieId, int page, {bool cache = true}) {
     return movieDbProvider.getMovies(MovieSection.RECOMMENDATIONS.url(movieId: movieId), page, useCache: cache);
   }
 
@@ -22,7 +22,7 @@ class MovieRepository {
     return movieDbProvider.getCasts(movieId, useCache: cache);
   }
 
-  Future<PageOf<Review>> getReviews(int movieId, int page, {bool cache = true}) {
+  Future<Page<Review>> getReviews(int movieId, int page, {bool cache = true}) {
     return movieDbProvider.getReviews(movieId, page, useCache: cache);
   }
 
