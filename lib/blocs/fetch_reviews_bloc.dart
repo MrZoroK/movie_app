@@ -1,16 +1,12 @@
 import 'package:bloc/bloc.dart';
-import 'package:get_it/get_it.dart';
 
 import 'package:movie_app/models.dart';
-import 'package:movie_app/resources/movie_repository.dart';
-
 import 'events/fetch_page.dart';
 import 'events/fetch_reviews.dart';
 import 'fetch_page_bloc.dart';
 import 'states/fetch_page.dart';
 
 class FetchReviewsBloc extends FetchPageBloc {
-  final MovieRepository repository = GetIt.I.get();
   final MovieBase movie;
   List<ReviewDetail> _listReviewDetails = List();
   

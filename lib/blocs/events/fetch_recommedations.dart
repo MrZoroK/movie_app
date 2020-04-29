@@ -7,5 +7,5 @@ class FetchRecommendationEvent extends FetchMoviesEvent {
   FetchRecommendationEvent(this.movieId, bool cache) : super(MovieSection.RECOMMENDATIONS, cache);
 
   @override
-  String toString() => "FetchRecommendationEvent { movie_id: $movieId, page: $page, cache: $cache }";
+  String toString() => "FetchRecommendationEvent { movie_id: $movieId, section: ${super.toString()} }";
 }

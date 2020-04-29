@@ -7,7 +7,6 @@ import '../blocs.dart';
 
 class MovieDetailBloc extends BlocBase {
   final MovieBase movie;
-  List<ReviewDetail> _listReviewDetails = List();
 
   MovieDetailBloc(this.movie);
 
@@ -19,12 +18,6 @@ class MovieDetailBloc extends BlocBase {
   var _recommendationsPublisher = PublishSubject<Page<MovieBase>>();
   Stream<Page<MovieBase>> get recommendation => _recommendationsPublisher.stream;
 
-  var _videosPublisher = PublishSubject<Page<Video>>();
-  Stream<Page<Video>> get videos => _videosPublisher.stream;
-
-  var _reviewsPublisher = PublishSubject<Page<Review>>();
-  Stream<Page<Review>> get reviews => _reviewsPublisher.stream;
-
   var _genresPublisher = PublishSubject<List<String>>();
   Stream<List<String>> get genres => _genresPublisher.stream;
 
@@ -32,14 +25,6 @@ class MovieDetailBloc extends BlocBase {
     repository.getCasts(movie.id, cache: cache).then((value){
       if (!_castsPublisher.isClosed) {
         _castsPublisher.sink.add(Page.fromList(value));
-      }
-    });
-  }
-
-  void loadVideos(bool cache) {
-    repository.getVideos(movie.id, cache: cache).then((value){
-      if (!_videosPublisher.isClosed) {
-        _videosPublisher.sink.add(Page.fromList(value));
       }
     });
   }
@@ -61,30 +46,6 @@ class MovieDetailBloc extends BlocBase {
     });
   }
 
-  void _internalLoadReviews(int page, bool cache) {
-    repository.getReviews(movie.id, page, cache: cache).then((value){
-      value.items.forEach((review) {
-        _listReviewDetails.forEach((detail) {
-          if (review.id == detail.id) {
-            review.detail = detail;
-          }
-        });
-      });
-      if (!_reviewsPublisher.isClosed){
-         _reviewsPublisher.sink.add(value);
-      }
-    });
-  }
-  void loadReviews(int page, bool cache) {
-    if (_listReviewDetails.length > 0) {
-      _internalLoadReviews(page, cache);
-    } else {
-      repository.getReviewsDetail(movie, cache: cache).then((value){
-         _listReviewDetails = value;
-        _internalLoadReviews(page, cache);
-      });
-    }
-  }
   void loadGenres(bool cache) {
     repository.getGenres(cache: cache).then((allGenres){
       if (allGenres != null) {
@@ -109,8 +70,6 @@ class MovieDetailBloc extends BlocBase {
   void dispose() {
     _castsPublisher.close();
     _recommendationsPublisher.close();
-    _videosPublisher.close();
-    _reviewsPublisher.close();
     _genresPublisher.close();
   }
 }

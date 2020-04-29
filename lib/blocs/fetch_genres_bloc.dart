@@ -1,17 +1,13 @@
 import 'package:bloc/bloc.dart';
-import 'package:get_it/get_it.dart';
 import 'package:movie_app/blocs/events/fetch_genres.dart';
 import 'package:movie_app/blocs/fetch_page_bloc.dart';
 import 'package:movie_app/models.dart';
 import 'package:movie_app/models/genre.dart';
-import 'package:movie_app/resources/movie_repository.dart';
 
 import 'events/fetch_page.dart';
 import 'states/fetch_page.dart';
 
-class FetchGenresBloc extends FetchPageBloc {
-  final MovieRepository repository = GetIt.I.get();
-  
+class FetchGenresBloc extends FetchPageBloc {  
   @override
   FetchPageState get initialState => FetchPageStateNone();
 

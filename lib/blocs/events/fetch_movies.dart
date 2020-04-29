@@ -3,8 +3,8 @@ import 'fetch_page.dart';
 
 class FetchMoviesEvent extends FetchPageEvent {
   final MovieSection movieSection;
-  FetchMoviesEvent(this.movieSection, bool cache) : super(1, cache);
+  FetchMoviesEvent(this.movieSection, bool cache) : super(cache: cache);
 
   @override
-  String toString() => "FetchMoviesEvent { section: ${movieSection.toStr}, page: $page, cache: $cache }";
+  String toString() => "FetchMoviesEvent { section: ${movieSection.toStr}, page: ${super.toString()} }";
 }

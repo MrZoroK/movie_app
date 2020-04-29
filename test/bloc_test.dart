@@ -3,11 +3,9 @@ import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get_it/get_it.dart';
-import 'package:http/http.dart';
 import 'package:mockito/mockito.dart';
 import 'package:movie_app/blocs.dart';
 import 'package:movie_app/blocs/states/fetch_page.dart';
-import 'package:movie_app/config/constant.dart';
 import 'package:movie_app/config/movie_section.dart';
 import 'package:movie_app/models.dart';
 import 'package:movie_app/resources/movie_repository.dart';

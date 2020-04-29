@@ -2,6 +2,8 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:movie_app/blocs/events/fetch_videos.dart';
+import 'package:movie_app/blocs/fetch_videos_bloc.dart';
 
 import 'package:movie_app/config/constant.dart';
 import 'package:movie_app/ui/screens/movie_detail_component/comment_item.dart';
@@ -473,17 +475,18 @@ class _MovieDetailScreenState extends State<MovieDetailScreen> {
   Widget _buildVideoSection() {
     return SectionWidget(
       text: "Video", sectionStyle: SectionStyle.DETAIL,
-      list: ExpandableListView(
-        stream: _bloc.videos,
-        itemBuilder: (context, item){
-          return _buildVideoCard(item);
+      list: BlocProvider<FetchPageBloc>(
+        create: (context){
+          return FetchVideosBloc();
         },
-        onLoadMore: (_, fromCache){
-          //to refresh
-          _bloc.loadVideos(fromCache);
-        },
-        pullToRefresh: false,
-        height: 180,
+        child: ExpandablePageView(
+          itemBuilder: (context, item){
+            return _buildVideoCard(item);
+          },
+          fetchMoreEvent: FetchVideosEvent(_bloc.movie.id, true),
+          pullToRefresh: false,
+          height: 180,
+        )
       ),
     );
   }

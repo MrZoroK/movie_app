@@ -1,7 +1,5 @@
 import 'package:bloc/bloc.dart';
-import 'package:get_it/get_it.dart';
 import 'package:movie_app/blocs/events/fetch_recommedations.dart';
-import 'package:movie_app/resources/movie_repository.dart';
 
 import '../models.dart';
 import 'events/fetch_movies.dart';
@@ -9,9 +7,7 @@ import 'events/fetch_page.dart';
 import 'fetch_page_bloc.dart';
 import 'states/fetch_page.dart';
 
-class FetchMoviesBloc extends FetchPageBloc {
-  final MovieRepository repository = GetIt.I.get();
-  
+class FetchMoviesBloc extends FetchPageBloc {  
   @override
   FetchPageState get initialState => FetchPageStateNone();
 
